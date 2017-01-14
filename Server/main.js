@@ -1,5 +1,3 @@
-//r request = require('request');
-var url = require('url');
 var express = require('express');
 var bodyParser = require('body-parser')
 var jwt = require('jsonwebtoken');
@@ -9,7 +7,18 @@ var apiRoutes = express.Router();
 
 var handler = require("./RequestHandler");
 
-app.use(bodyParser.json());
+
+const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(.\d{3})?Z$/;
+
+function reviveDates(key, value) {
+    if (typeof value === "string" && dateFormat.test(value)) {
+        return new Date(value);
+    }
+    
+    return value;
+}
+
+app.use(bodyParser.json({reviver: reviveDates}));
 
 //////////////////////////////////////////////////////////
 // POST authentication enpoints (login | logout | signup)
@@ -117,7 +126,7 @@ apiRoutes.post('/tasks', function(req, response) {
 });
 
 apiRoutes.post('/assignments', function(req, response) {
-	handler.handlePostRequest("tasks", req, response);
+	handler.handlePostRequest("assignments", req, response);
 });
 
 
@@ -154,3 +163,4 @@ app.use('/api', apiRoutes);
 app.listen(8081);
 
 console.log('Server running at http://127.0.0.1:8081/');
+

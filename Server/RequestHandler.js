@@ -1,8 +1,8 @@
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
-var url = 'mongodb://localhost:27017/homie';
 var jwt = require('jsonwebtoken');
 
+var sUrl = 'mongodb://localhost:27017/homie';
 function getColName(sEntityName) {
 	return sEntityName;
 }
@@ -13,14 +13,14 @@ function checkValidity(sEntityName, oObject) {
 
 function convertHexToObjectID(sHex) {	
 	try {
-		return ObjectID.createFromHexString(sObjectId);
+		return ObjectID.createFromHexString(sHex);
 	} catch (err) {
 		return null;
 	}
 }
 
 var handleLoginRequest = function(oUser, secretKey, responseStream) {
-		MongoClient.connect(url, function(err, db) {
+		MongoClient.connect(sUrl, function(err, db) {
 		var col = db.collection("users");
 		col.findOne({name: oUser.name}, function(err, user) {
 			if (err) 
@@ -45,7 +45,7 @@ var handleLoginRequest = function(oUser, secretKey, responseStream) {
 };
 
 var handleSignUpRequest = function(oUser, secretKey, responseStream) {
-	MongoClient.connect(url, function(err, db) {	
+	MongoClient.connect(sUrl, function(err, db) {	
 		var col = db.collection("users");
 		if (checkValidity("users", oUser)) {
 			oUser.groupIds = [];
@@ -69,9 +69,9 @@ var handleSignUpRequest = function(oUser, secretKey, responseStream) {
 
 var handleGetByIdRequest = function(sEntityName, sId, responseStream) {
 	var colName = getColName(sEntityName);
-	MongoClient.connect(url, function(err, db) {
+	MongoClient.connect(sUrl, function(err, db) {
 		var col = db.collection(colName);
-		col.findOne({_id: convertHexToObjectID(sObjectId)}, function(err, item) {
+		col.findOne({_id: convertHexToObjectID(sId)}, function(err, item) {
 			responseStream.json(item);
 		    db.close();
 	  	});
@@ -81,7 +81,7 @@ var handleGetByIdRequest = function(sEntityName, sId, responseStream) {
 var handleGetRequest = function(sEntityName, req, responseStream) {
 	var colName = getColName(sEntityName);
 	var query = req.query;
-	MongoClient.connect(url, function(err, db) {
+	MongoClient.connect(sUrl, function(err, db) {
 		var col = db.collection(colName);
 		if (Object.getOwnPropertyNames(query).length === 0) {
 			query.owner = req.user._id.toString();
@@ -97,7 +97,7 @@ var handleGetRequest = function(sEntityName, req, responseStream) {
 var handlePostRequest = function(sEntityName, req, responseStream) {
 	var oObject = req.body;
 	var colName = getColName(sEntityName);
-	MongoClient.connect(url, function(err, db) {	
+	MongoClient.connect(sUrl, function(err, db) {	
 		var col = db.collection(colName);
 		if (checkValidity(colName, oObject)) {
 			oObject.owner = req.user._id.toString();
@@ -114,7 +114,7 @@ var handlePutRequest = function(sEntityName, req, responseStream) {
 	var oFieldsToUpdate = req.body,
 		colName = getColName(sEntityName);
 		sObjectId = req.params.id;
-	MongoClient.connect(url, function(err, db) {	
+	MongoClient.connect(sUrl, function(err, db) {	
 		var col = db.collection(colName);
 		if (checkValidity(colName, oFieldsToUpdate)) {
 			col.update({_id: convertHexToObjectID(sObjectId)}, {
@@ -137,9 +137,9 @@ var handleDeleteRequest = function(sEntityName, req, responseStream) {
 	var colName = getColName(sEntityName),
 		sObjectId = req.params.id,
 		sOwnerId = req.user._id.toString();
-	MongoClient.connect(url, function(err, db) {	
+	MongoClient.connect(sUrl, function(err, db) {	
 		var col = db.collection(colName);
-		col.remove({_id: convertHexToObjectID(sObjectId), owner: convertHexToObjectID(sOwnerId)},	function(err, result) {
+		col.remove({_id: convertHexToObjectID(sObjectId), owner: sOwnerId},	function(err, result) {
 			var message = result.result.n > 0 
 				? "Object was deleted successfully" 
 				: "Object deletion failed - object ID does not exist";
@@ -158,3 +158,4 @@ exports.handlePutRequest = handlePutRequest;
 exports.handleDeleteRequest = handleDeleteRequest;
 exports.handleLoginRequest = handleLoginRequest;
 exports.handleSignUpRequest = handleSignUpRequest;
+
