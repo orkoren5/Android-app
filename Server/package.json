@@ -1,0 +1,14 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Or Koren",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^2.2.16"
+  }
+}
