@@ -39,7 +39,7 @@ var handleLoginRequest = function(oUser, secretKey, responseStream) {
 		          token: token
 		        });
 	      	}
-	      	db.colse();
+	      	db.close();
 	  	});
 	});
 };
@@ -159,3 +159,4 @@ exports.handleDeleteRequest = handleDeleteRequest;
 exports.handleLoginRequest = handleLoginRequest;
 exports.handleSignUpRequest = handleSignUpRequest;
 
+

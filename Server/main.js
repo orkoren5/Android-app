@@ -46,7 +46,7 @@ apiRoutes.use(function(req, res, next) {
 
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['token'];
-
+  console.log("request received: " + req.method + " " + req.originalUrl);
   // decode token
   if (token) {
 
@@ -113,10 +113,6 @@ apiRoutes.get('/tasks', function(req, response) {
 // POST request enpoints
 //////////////////////////////////////////////////////////
 
-apiRoutes.post('/users', function(req, response) {
-	handler.handlePostRequest("users", req, response);
-});
-
 apiRoutes.post('/groups', function(req, response) {
 	handler.handlePostRequest("groups", req, response);
 });
@@ -156,6 +152,14 @@ apiRoutes.put('/assignments/:id', function(req, response) {
 
 apiRoutes.delete('/groups/:id', function(req, response) {
 	handler.handleDeleteRequest("groups", req, response);
+});
+
+apiRoutes.delete('/tasks/:id', function(req, response) {
+	handler.handleDeleteRequest("tasks", req, response);
+});
+
+apiRoutes.delete('/assignments/:id', function(req, response) {
+	handler.handleDeleteRequest("assignments", req, response);
 });
 
 app.use('/api', apiRoutes);
