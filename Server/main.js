@@ -53,7 +53,7 @@ apiRoutes.use(function(req, res, next) {
     // verifies secret and checks exp
     jwt.verify(token, app.get('secretKey'), function(err, decoded) {      
       if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });    
+        return res.status(403).json({ success: false, message: 'Failed to authenticate token.' });    
       } else {
         req.user = decoded;    
         next();
