@@ -19,6 +19,16 @@ function convertHexToObjectID(sHex) {
 	}
 }
 
+function parseQuery(query) {
+	for (var key in query) {
+  		var value = query[key];
+		if (!isNaN(value)) {
+			query[key] = value*1;
+		}
+	};
+	return query;
+}
+
 var handleLoginRequest = function(oUser, secretKey, responseStream) {
 		MongoClient.connect(sUrl, function(err, db) {
 		var col = db.collection("users");
@@ -86,7 +96,7 @@ var handleGetRequest = function(sEntityName, req, responseStream) {
 		if (Object.getOwnPropertyNames(query).length === 0) {
 			query.owner = req.user._id.toString();
 		}
-		col.find(query).toArray(function(err, items) {
+		col.find(parseQuery(query)).toArray(function(err, items) {
 			responseStream.json(items);
 		    db.close();
 	  	});
@@ -159,4 +169,4 @@ exports.handleDeleteRequest = handleDeleteRequest;
 exports.handleLoginRequest = handleLoginRequest;
 exports.handleSignUpRequest = handleSignUpRequest;
 
-
+
