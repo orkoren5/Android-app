@@ -13,9 +13,17 @@ import java.util.List;
 public class Course extends BusinessEntity{
     String name;
     long number;
-    List<Assignment> assignmentList = new ArrayList<Assignment>();
+    List<Assignment> assignmentList = new ArrayList<>();
 
-    private Course() {};
+    public Course() {};
+
+    private String[] getAssignmentIdsArr() {
+        String[] ids = new String[assignmentList.size()];
+        for (int i=0; i < assignmentList.size(); i++) {
+            ids[i] = assignmentList.get(i).getID();
+        }
+        return ids;
+    }
 
     public Course(String name, int number) {
         this.name = name;
@@ -35,8 +43,12 @@ public class Course extends BusinessEntity{
     }
 
     @Override
-    public JSONObject toJSON() {
-        return null;
+    public JSONObject toJSON() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("name", name);
+        json.put("number", number);
+        json.put("assignmentIDs", getAssignmentIdsArr());
+        return json;
     }
 
     public void setName(String name) {
@@ -47,7 +59,8 @@ public class Course extends BusinessEntity{
         return  assignmentList;
     }
 
-    public static Course parseJSON(JSONObject json) throws JSONException{
+    @Override
+    public Course parseJSON(JSONObject json) throws JSONException{
         Course c = new Course();
         c.setNumber(json.getLong("number"));
         c.setName(json.getString("name"));

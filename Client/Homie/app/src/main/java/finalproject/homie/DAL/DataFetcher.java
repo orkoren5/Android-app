@@ -50,13 +50,13 @@ public class DataFetcher {
     private static class GetDataTask<T extends BusinessEntity> extends AsyncTask<String, Integer, StatusLine> {
 
         List<T> list = null;
-        BusinessEntity.BusinessEntityFactory<T> factory = null;
+        BusinessEntity.Factory<T> factory = null;
         BaseAdapter adapter;
 
         public GetDataTask(List<T> list, BaseAdapter adapter, Class<T> c) {
             this.list = list;
             this.adapter = adapter;
-            factory = new BusinessEntity.BusinessEntityFactory(c);
+            factory = new BusinessEntity.Factory(c);
         }
 
         protected StatusLine doInBackground(String[] urls) {

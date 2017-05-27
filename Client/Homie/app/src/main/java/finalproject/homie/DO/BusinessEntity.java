@@ -1,5 +1,6 @@
 package finalproject.homie.DO;
 
+import android.databinding.BaseObservable;
 import android.support.annotation.Nullable;
 
 import org.json.JSONException;
@@ -9,17 +10,17 @@ import org.json.JSONObject;
  * Created by I311044 on 05/03/2017.
  */
 
-public abstract class BusinessEntity {
+public abstract class BusinessEntity extends BaseObservable{
     private String ID;
 
     public String getID() {
         return ID;
     }
 
-    public static class BusinessEntityFactory<T extends BusinessEntity> {
+    public static class Factory<T extends BusinessEntity> {
 
         Class<T> c;
-        public BusinessEntityFactory(Class<T> c) {
+        public Factory(Class<T> c) {
             this.c = c;
         }
         public T create() {

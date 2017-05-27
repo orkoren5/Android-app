@@ -26,4 +26,17 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="title_activity_edit_assignment">Edit Assignments</string>
+    <string name="title_activity_task_list">Task List</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="ass_no_hint">Assignment No.</string>
+    <string name="ass_days_assess_hint">Days Assessment</string>
+    <string name="ass_deadline_hint">Deadline</string>
+    <string name="todo_title">To Do</string>
+    <string name="in_process_title">In Process</string>
+    <string name="done_title">Done</string>
+    <string name="ass_name">%1$s : Assignment %2$d</string>
+    <string name="date_format">%1$te/%1$tm/%1$tY</string>
 </resources>

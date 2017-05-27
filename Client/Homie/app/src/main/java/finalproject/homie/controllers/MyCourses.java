@@ -20,9 +20,9 @@ public class MyCourses extends BaseNavigationActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_my_courses);
         super.onCreate(savedInstanceState);
         System.out.print("********Creating activity Courses\n");
-        setContentView(R.layout.activity_my_courses);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -36,6 +36,11 @@ public class MyCourses extends BaseNavigationActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         this.getIntent().putExtra("RELOAD_DATA", true);
+    }
+
+    @Override
+    protected void additem() {
+
     }
 
     @Override
