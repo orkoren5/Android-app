@@ -61,10 +61,9 @@ public class Course extends BusinessEntity{
 
     @Override
     public Course parseJSON(JSONObject json) throws JSONException{
-        Course c = new Course();
-        c.setNumber(json.getLong("number"));
-        c.setName(json.getString("name"));
-        c.setID(json.getString("_id"));
-        return c;
+        this.setNumber(json.getLong("number"));
+        this.setName(json.getString("name"));
+        this.setID(json.getString("_id"));
+        return this;
     }
 }

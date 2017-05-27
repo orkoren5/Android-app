@@ -112,6 +112,7 @@ var _handleGetRequestWithLookup = function(sEntityName, req, responseStream) {
 		if (Object.getOwnPropertyNames(query).length === 0) {
 			query.owner = req.user._id.toString();
 		}
+		console.log(req.query);
 		col.aggregate([{ "$match": parseQuery(query) }, {"$lookup": lookup}]).toArray(function(err, items) {
 			responseStream.json(items);
 		    db.close();
