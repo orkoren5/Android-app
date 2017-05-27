@@ -86,7 +86,7 @@ apiRoutes.get('/assignments/:id', function(req, response) {
 });
 
 apiRoutes.get('/assignments', function(req, response) {
-	handler.handleGetRequest("assignments", req, response);
+	handler.handleGetAssignmentsRequest(req, response);
 });
 
 apiRoutes.get('/groups/:id', function(req, response) {

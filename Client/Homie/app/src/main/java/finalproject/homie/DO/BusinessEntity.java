@@ -49,6 +49,11 @@ public abstract class BusinessEntity extends BaseObservable{
         }
     }
 
+    @Override
+    public int hashCode() {
+        return ID.hashCode();
+    }
+
     public abstract BusinessEntity parseJSON(JSONObject json) throws  JSONException;
 
     public abstract JSONObject toJSON() throws JSONException;

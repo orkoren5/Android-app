@@ -5,6 +5,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import finalproject.homie.DAL.*;
 import finalproject.homie.DO.*;
@@ -22,6 +23,7 @@ public class Model {
 
     List<Course> myCourses = new ArrayList<>();
     List<Assignment> myAssignments = new ArrayList<>();
+    HashMap<String, List<Task>> tasks = new HashMap<>();
     Assignment selectedAssignment = null;
     String rawData;
     int dirtyFalgs = 0;
@@ -47,6 +49,18 @@ public class Model {
         return myCourses.get(courseIndex).getAssignmentList();
     }
 
+    public List<Task> getTasksForAssignment(String assignmentId) {
+        List<Task> list = tasks.get(assignmentId);
+        if (list == null) {
+            list = new ArrayList<>();
+            tasks.put(assignmentId, list);
+        }
+        return list;
+    }
+
+    public void updateTasksForAssignment(Assignment a) {
+        tasks.put(a.getID(), a.getTasks());
+    }
     public void setSelectedAssignment(Assignment selectedAssignment) {
         this.selectedAssignment = selectedAssignment;
     }
@@ -59,6 +73,7 @@ public class Model {
     public void setDirty(int flag) {
         dirtyFalgs |= flag;
     }
+
     /**
      * Checks if there was a change in any of the lists of the model. Upen checking, clears the
      * indicator.

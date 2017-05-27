@@ -14,8 +14,10 @@ import java.util.List;
 
 import finalproject.homie.DO.Assignment;
 import finalproject.homie.DO.Course;
+import finalproject.homie.DO.Task;
 import finalproject.homie.R;
 import finalproject.homie.adapters.AssignmentsAdapter;
+import finalproject.homie.adapters.TasksAdapter;
 import finalproject.homie.model.Model;
 
 public class TaskList extends BaseNavigationActivity
@@ -43,21 +45,16 @@ public class TaskList extends BaseNavigationActivity
         super.onResume();
         Model m = ((BaseApplication) getApplication()).getModel();
         if (m.checkAndRemoveIsDirty(Model.ASSIGNMENT_FLAG)){
-            long courseNumber = this.getIntent().getLongExtra("COURSE_NUMBER", 0);
-            int courseIndex = this.getIntent().getIntExtra("COURSE_INDEX", 0);
+            String assignmentId = this.getIntent().getStringExtra("ASSIGNMENT_ID");
 
-            List<Assignment> list = m.getAssignmentsForCourse(courseIndex);
-            AssignmentsAdapter aa = new AssignmentsAdapter(this, list);
-            if (list.isEmpty()) {
-                aa.fetchDataFromBH(courseNumber);
-                //m.setDirty(Model.ASSIGNMENT_FLAG);
-            }
+            List<Task> list = m.getTasksForAssignment(assignmentId);
+            TasksAdapter ta = new TasksAdapter(this, list);
 
             RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
             mRecyclerView.setHasFixedSize(true);
             GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
             mRecyclerView.setLayoutManager(mLayoutManager);
-            mRecyclerView.setAdapter(aa);
+            mRecyclerView.setAdapter(ta);
         }
     }
 

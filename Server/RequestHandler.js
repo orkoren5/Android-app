@@ -103,6 +103,36 @@ var handleGetRequest = function(sEntityName, req, responseStream) {
 	});
 };
 
+var _handleGetRequestWithLookup = function(sEntityName, req, responseStream) {
+	var colName = getColName(sEntityName);
+	var query = req.query;
+	var lookup = req.lookup;
+	MongoClient.connect(sUrl, function(err, db) {
+		var col = db.collection(colName);
+		if (Object.getOwnPropertyNames(query).length === 0) {
+			query.owner = req.user._id.toString();
+		}
+		col.aggregate([{ "$match": parseQuery(query) }, {"$lookup": lookup}]).toArray(function(err, items) {
+			responseStream.json(items);
+		    db.close();
+	  	});
+	});
+};
+
+var handleGetAssignmentsRequest = function(req, responseStream) {
+	req.query["users"] = {
+		"$in" : [
+			req.user._id.toString()
+		]
+	};
+	req["lookup"] = {
+		from: "tasks", 
+		localField: "_id", 
+		foreignField: "assignmentId", 
+		as: "tasks"
+	};
+	_handleGetRequestWithLookup("assignments", req, responseStream);
+}
 
 var handlePostRequest = function(sEntityName, req, responseStream) {
 	var oObject = req.body;
@@ -163,6 +193,7 @@ var handleDeleteRequest = function(sEntityName, req, responseStream) {
 
 exports.handleGetByIdRequest = handleGetByIdRequest;
 exports.handleGetRequest = handleGetRequest;
+exports.handleGetAssignmentsRequest = handleGetAssignmentsRequest;
 exports.handlePostRequest = handlePostRequest;
 exports.handlePutRequest = handlePutRequest;
 exports.handleDeleteRequest = handleDeleteRequest;

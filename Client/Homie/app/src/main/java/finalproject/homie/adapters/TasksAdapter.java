@@ -14,40 +14,36 @@ import java.util.List;
 
 import finalproject.homie.DAL.DataFetcher;
 import finalproject.homie.DO.Assignment;
+import finalproject.homie.DO.Task;
 import finalproject.homie.R;
 import finalproject.homie.controllers.BaseApplication;
-import finalproject.homie.controllers.IDataResponseHandler;
 
 /**
  * Created by I311044 on 02/03/2017.
  */
 
-public class AssignmentsAdapter extends BaseAdapter<AssignmentsAdapter.AssignmentsViewHolder> {
+public class TasksAdapter extends BaseAdapter<TasksAdapter.AssignmentsViewHolder> {
 
-    List<Assignment> assignments;
+    List<Task> tasks;
 
     public class AssignmentsViewHolder extends RecyclerView.ViewHolder {
-        public TextView txtDeadLine;
-        public TextView txtNumber;
+        public TextView txtName;
+        public TextView txtAssignedUser;
+        public TextView txtDaysAssessment;
+        public TextView txtStatus;
 
         public AssignmentsViewHolder(View view) {
             super(view);
-            txtDeadLine = (TextView) view.findViewById(R.id.txtDeadLine);
-            txtNumber = (TextView) view.findViewById(R.id.txtNumber);
+            txtName = (TextView) view.findViewById(R.id.txtName);
+            txtAssignedUser = (TextView) view.findViewById(R.id.txtAssignedUser);
+            txtDaysAssessment = (TextView) view.findViewById(R.id.txtDaysAssessment);
+            txtStatus = (TextView) view.findViewById(R.id.txtStatus);
         }
     }
 
-    public AssignmentsAdapter(Context context, List<Assignment> assignments) {
-        this.assignments = assignments;
+    public TasksAdapter(Context context, List<Task> tasks) {
+        this.tasks = tasks;
         this.context = context;
-    }
-
-    public void fetchDataFromBH(IDataResponseHandler handler) {
-        this.fetchDataFromBH(0, handler);
-    }
-    public void fetchDataFromBH(long courseNumber, final IDataResponseHandler handler) {
-        final AssignmentsAdapter adapter = this;
-
     }
 
     @Override
@@ -60,16 +56,14 @@ public class AssignmentsAdapter extends BaseAdapter<AssignmentsAdapter.Assignmen
 
     @Override
     public void onBindViewHolder(AssignmentsViewHolder holder, int position) {
-        Assignment assignment = assignments.get(position);
+        Task task = tasks.get(position);
         Resources res = this.context.getResources();
-        SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        String sDate = f.format(assignment.getDeadline());
-        holder.txtDeadLine.setText(res.getString(R.string.deadline, sDate));
-        holder.txtNumber.setText(res.getString(R.string.assignment_no, assignment.getNumber()));
+        holder.txtName.setText(task.getTitle());
+        holder.txtDaysAssessment.setText(String.valueOf(task.getDaysAssessment()));
     }
 
     @Override
     public int getItemCount() {
-        return assignments.size();
+        return tasks.size();
     }
 }

@@ -13,9 +13,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import java.io.IOException;
 import java.util.List;
 
 import finalproject.homie.DAL.DataAppender;
+import finalproject.homie.DAL.DataFetcher;
 import finalproject.homie.DO.Assignment;
 import finalproject.homie.DO.Course;
 import finalproject.homie.R;
@@ -46,16 +48,33 @@ public class MyAssignments extends BaseNavigationActivity
     @Override
     protected void onResume() {
         super.onResume();
-        Model m = ((BaseApplication) getApplication()).getModel();
+        final Model m = ((BaseApplication) getApplication()).getModel();
         if (m.checkAndRemoveIsDirty(Model.ASSIGNMENT_FLAG)){
             long courseNumber = this.getIntent().getLongExtra("COURSE_NUMBER", 0);
             int courseIndex = this.getIntent().getIntExtra("COURSE_INDEX", 0);
 
-            List<Assignment> list = m.getAssignmentsForCourse(courseIndex);
-            AssignmentsAdapter aa = new AssignmentsAdapter(this, list);
+            final List<Assignment> list = m.getAssignmentsForCourse(courseIndex);
+            final AssignmentsAdapter aa = new AssignmentsAdapter(this, list);
             if (list.isEmpty()) {
-                aa.fetchDataFromBH(courseNumber);
-                //m.setDirty(Model.ASSIGNMENT_FLAG);
+                DataFetcher fetcher = new DataFetcher(((BaseApplication)getApplicationContext()).getToken());
+                try {
+                    fetcher.getAssignments(list, courseNumber, new IDataResponseHandler() {
+                        @Override
+                        public void OnError(int errorCode) {
+                            // TODO: handler error
+                        }
+
+                        @Override
+                        public void OnSuccess() {
+                            for (Assignment a : list) {
+                                m.updateTasksForAssignment(a);
+                            }
+                            aa.notifyDataSetChanged();
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);

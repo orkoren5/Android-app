@@ -14,6 +14,8 @@ import java.util.List;
 import finalproject.homie.DAL.DataFetcher;
 import finalproject.homie.DO.Course;
 import finalproject.homie.R;
+import finalproject.homie.controllers.BaseApplication;
+import finalproject.homie.controllers.IDataResponseHandler;
 import finalproject.homie.controllers.MyAssignments;
 
 /**
@@ -53,9 +55,20 @@ public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder>
     }
 
     public void fetchDataFromBH() {
-        DataFetcher fetcher = new DataFetcher(this);
+        DataFetcher fetcher = new DataFetcher(((BaseApplication)context.getApplicationContext()).getToken());
+        final CoursesAdapter adapter = this;
         try {
-            fetcher.getCourses(this.courses);
+            fetcher.getCourses(this.courses, new IDataResponseHandler() {
+                @Override
+                public void OnError(int errorCode) {
+                    // TODO: handle Error
+                }
+
+                @Override
+                public void OnSuccess() {
+                    adapter.notifyDataSetChanged();
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -16,6 +16,7 @@ import finalproject.homie.DO.BusinessEntity;
 import finalproject.homie.DO.Course;
 import finalproject.homie.adapters.BaseAdapter;
 import finalproject.homie.controllers.BaseApplication;
+import finalproject.homie.controllers.IDataResponseHandler;
 import finalproject.homie.controllers.LoginActivity;
 
 import java.io.BufferedReader;
@@ -29,33 +30,35 @@ import java.util.List;
 
 public class DataFetcher {
 
-    String baseUrl = "http://159.203.118.144:8081/";
+    private String baseUrl = "http://159.203.118.144:8081/";
+    private String token;
 
-    BaseAdapter adapter;
-
-    public DataFetcher(BaseAdapter adapter) {
-        this.adapter = adapter;
+    public DataFetcher(String token) {
+        this.token = token;
     }
 
-    public void getCourses(List<Course> list) throws IOException {
+    public void getCourses(List<Course> list, IDataResponseHandler handler) throws IOException {
         String url = baseUrl + "api/courses?university=BGU";
-        new GetDataTask<Course>(list, this.adapter, Course.class).execute(url);
+        new GetDataTask<Course>(list, Course.class, this.token, handler).execute(url);
     }
 
-    public void getAssignments(List<Assignment> list, long courseNumber) throws IOException {
+    public void getAssignments(List<Assignment> list, long courseNumber, IDataResponseHandler handler)
+            throws IOException {
         String url = baseUrl + "api/assignments?courseNumber=" + courseNumber;
-        new GetDataTask<Assignment>(list, this.adapter, Assignment.class).execute(url);
+        new GetDataTask<Assignment>(list, Assignment.class, this.token, handler).execute(url);
     }
 
     private static class GetDataTask<T extends BusinessEntity> extends AsyncTask<String, Integer, StatusLine> {
 
-        List<T> list = null;
-        BusinessEntity.Factory<T> factory = null;
-        BaseAdapter adapter;
+        private List<T> list = null;
+        private BusinessEntity.Factory<T> factory = null;
+        private IDataResponseHandler handler;
+        private String token;
 
-        public GetDataTask(List<T> list, BaseAdapter adapter, Class<T> c) {
+        public GetDataTask(List<T> list, Class<T> c, String token, IDataResponseHandler handler) {
             this.list = list;
-            this.adapter = adapter;
+            this.handler = handler;
+            this.token = token;
             factory = new BusinessEntity.Factory(c);
         }
 
@@ -64,7 +67,6 @@ public class DataFetcher {
             HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
             HttpGet request = new HttpGet(urls[0]);
             BusinessEntity[] results = null;
-            String token = ((BaseApplication)adapter.getContext().getApplicationContext()).getToken();
             try {
                 // add request header
                 request.addHeader("Content-type", "application/json");
@@ -92,7 +94,8 @@ public class DataFetcher {
                 results = new BusinessEntity[arr.length()];
                 for (int i = 0; i < results.length; i++) {
                     T instance = factory.create();
-                    results[i] = instance.parseJSON(arr.getJSONObject(i));
+                    instance.parseJSON(arr.getJSONObject(i));
+                    results[i] = instance;
                     list.add((T) results[i]);
                 }
                 return response.getStatusLine();
@@ -110,7 +113,9 @@ public class DataFetcher {
             if (status == null) {
                 // Handle crash
             } else if (status.getStatusCode() == 200) {
-                adapter.notifyDataSetChanged();
+                if (handler != null) {
+                    handler.OnSuccess();
+                }
             } else if (status.getStatusCode() == 403) {
                 //Intent intent = new Intent(adapter.getContext(), LoginActivity.class);
                 //intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);

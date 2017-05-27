@@ -10,12 +10,14 @@ import android.nfc.FormatException;
 import android.text.Editable;
 import android.text.TextWatcher;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import finalproject.homie.BR;
@@ -27,10 +29,11 @@ import finalproject.homie.DO.Bindables.*;
 
 public class Assignment extends BusinessEntity {
     private long courseNumber;
-    int number;
-    Date deadline = new Date(0);
-    int daysAssessment;
-    Course relatedCourse;
+    private int number;
+    private Date deadline = new Date(0);
+    private int daysAssessment;
+    private Course relatedCourse;
+    private List<Task> tasks;
 
     private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -80,6 +83,10 @@ public class Assignment extends BusinessEntity {
         this.relatedCourse = relatedCoures;
     }
 
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
     @Override
     public JSONObject toJSON() throws JSONException{
         JSONObject json = new JSONObject();
@@ -93,18 +100,23 @@ public class Assignment extends BusinessEntity {
 
     @Override
     public Assignment parseJSON(JSONObject json) throws JSONException{
-        Assignment c = new Assignment();
-        c.setID(json.getString("_id"));
-        c.setCourseNumber(json.getLong("courseNumber"));
-        c.setDaysAssessment(json.getInt("daysAssessment"));
-        c.setNumber(json.getInt("number"));
+        this.setID(json.getString("_id"));
+        this.setCourseNumber(json.getLong("courseNumber"));
+        this.setDaysAssessment(json.getInt("daysAssessment"));
+        this.setNumber(json.getInt("number"));
         try {
-            c.setDeadline(format.parse(json.getString("deadline")));
+            this.setDeadline(format.parse(json.getString("deadline")));
         }
         catch (ParseException ex) {
             ex.printStackTrace();
-            c.setDeadline(new Date(0));
+            this.setDeadline(new Date(0));
         }
-        return c;
+        JSONArray arr = json.getJSONArray("tasks");
+        for (int i = 0; i < arr.length(); i++) {
+            Task t = new Task();
+            t.parseJSON(arr.getJSONObject(i));
+            tasks.add(t);
+        }
+        return this;
     }
 }
