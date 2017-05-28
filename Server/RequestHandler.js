@@ -29,6 +29,15 @@ function parseQuery(query) {
 	return query;
 }
 
+function clone(obj) {
+    if (!obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+}
+
 var handleLoginRequest = function(oUser, secretKey, responseStream) {
 		MongoClient.connect(sUrl, function(err, db) {
 		var col = db.collection("users");
@@ -143,12 +152,28 @@ var handlePostRequest = function(sEntityName, req, responseStream) {
 		if (checkValidity(colName, oObject)) {
 			oObject.owner = req.user._id.toString();
 			col.insertOne(oObject, function(err, result) {
-				responseStream.send(oObject._id.toString());
+				if (responseStream) {
+					responseStream.send(oObject._id.toString());
+				}
 				console.log(oObject._id);
 			    db.close();
 			});
 		}	
 	});
+};
+
+var handlePostAssignmentsRequest = function(req, responseStream) {
+
+	var clonedReq = {
+		body: clone(req.body),
+		user: clone(req.user)
+	};
+
+	delete req.body["users"];
+	handlePostRequest("assignments", req);
+
+	clonedReq.body["users"] = [ clonedReq.user._id.toString() ]; // Add selft to users list
+	handlePostRequest("assignments", clonedReq, responseStream);
 };
 
 var handlePutRequest = function(sEntityName, req, responseStream) {
@@ -196,6 +221,7 @@ exports.handleGetByIdRequest = handleGetByIdRequest;
 exports.handleGetRequest = handleGetRequest;
 exports.handleGetAssignmentsRequest = handleGetAssignmentsRequest;
 exports.handlePostRequest = handlePostRequest;
+exports.handlePostAssignmentsRequest = handlePostAssignmentsRequest;
 exports.handlePutRequest = handlePutRequest;
 exports.handleDeleteRequest = handleDeleteRequest;
 exports.handleLoginRequest = handleLoginRequest;

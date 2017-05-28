@@ -122,7 +122,7 @@ apiRoutes.post('/tasks', function(req, response) {
 });
 
 apiRoutes.post('/assignments', function(req, response) {
-	handler.handlePostRequest("assignments", req, response);
+	handler.handlePostAssignmentsRequest(req, response);
 });
 
 
