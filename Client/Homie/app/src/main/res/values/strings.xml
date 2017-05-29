@@ -27,6 +27,7 @@
         completions."
     </string>
     <string name="title_activity_edit_assignment">Edit Assignments</string>
+    <string name="title_activity_edit_task">Edit Assignments</string>
     <string name="title_activity_task_list">Task List</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
@@ -37,6 +38,14 @@
     <string name="todo_title">To Do</string>
     <string name="in_process_title">In Process</string>
     <string name="done_title">Done</string>
+    <string name="days_assessment">%1$s days</string>
     <string name="ass_name">%1$s : Assignment %2$d</string>
     <string name="date_format">%1$te/%1$tm/%1$tY</string>
+    <string name="task_name">%1$s</string>
+    <string name="task_title_hint">Title</string>
+    <string name="task_status_hint">Status</string>
+    <string name="task_processing_user_hint">Processing user</string>
+    <string name="task_description_hint">Decription</string>
+    <string name="task_days_assess_hint">Days assessment</string>
+    <string name="task_status">%1$d</string>
 </resources>

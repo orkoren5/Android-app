@@ -1,7 +1,11 @@
 package finalproject.homie.DO;
 
+import android.databinding.Bindable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import finalproject.homie.BR;
 
 /**
  * Created by I311044 on 27/05/2017.
@@ -24,14 +28,34 @@ public class Task extends BusinessEntity {
     private Status status;
     private String assignedUserId;
 
+    @Bindable
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    @Bindable
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
+        notifyPropertyChanged(BR.title);
     }
 
+    public String getAssignmentId() {
+        return assignmentId;
+    }
+
+    public void setAssignmentId(String assignmentId) {
+        this.assignmentId = assignmentId;
+    }
+
+    @Bindable
     public String getDescription() {
         return description;
     }
@@ -44,8 +68,26 @@ public class Task extends BusinessEntity {
         return daysAssessment;
     }
 
+    public void setAssignedUserId(String assignedUserId) {
+        this.assignedUserId = assignedUserId;
+    }
+
+    public String getAssignedUserId() {
+        return assignedUserId;
+    }
+
+    @Bindable
     public void setDaysAssessment(int daysAssessment) {
         this.daysAssessment = daysAssessment;
+        notifyPropertyChanged(BR.daysAssessment);
+    }
+
+    public Assignment getRelatedAssignment() {
+        return assignment;
+    }
+
+    public void setRelatedAssignment(Assignment assignment) {
+        this.assignment = assignment;
     }
 
     @Override
@@ -62,6 +104,17 @@ public class Task extends BusinessEntity {
 
     @Override
     public JSONObject toJSON() throws JSONException {
-        return null;
+        JSONObject json = new JSONObject();
+        json.put("title", title);
+        json.put("description", description);
+        json.put("status", 1);
+        json.put("assignedUserId", assignedUserId);
+        json.put("assignmentId", assignmentId);
+        return json;
+    }
+
+    @Override
+    public String getForeignIdFields() {
+        return "assignmentId,assignedUserId";
     }
 }

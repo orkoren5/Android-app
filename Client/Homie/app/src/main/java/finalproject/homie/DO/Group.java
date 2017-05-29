@@ -25,4 +25,9 @@ public class Group extends BusinessEntity {
     public JSONObject toJSON() throws JSONException {
         return null;
     }
+
+    @Override
+    public String getForeignIdFields() {
+        return null;
+    }
 }

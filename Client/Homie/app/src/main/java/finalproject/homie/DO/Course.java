@@ -51,6 +51,11 @@ public class Course extends BusinessEntity{
         return json;
     }
 
+    @Override
+    public String getForeignIdFields() {
+        return null;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

@@ -33,11 +33,6 @@
             android:name=".controllers.MyCourses"
             android:label="@string/title_activity_navigaion"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".controllers.LoginActivity"
@@ -57,6 +52,19 @@
             android:label="@string/title_activity_task_list"
             android:parentActivityName=".controllers.MyAssignments">
 
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="finalproject.homie.controllers.MyAssignments" />
+        </activity>
+        <activity
+            android:name=".controllers.EditTask"
+            android:label="@string/title_activity_edit_task"
+            android:parentActivityName=".controllers.MyAssignments">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="finalproject.homie.controllers.MyAssignments" />

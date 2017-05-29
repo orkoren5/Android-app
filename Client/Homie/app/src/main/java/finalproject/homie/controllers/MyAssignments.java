@@ -52,9 +52,11 @@ public class MyAssignments extends BaseNavigationActivity
         if (m.checkAndRemoveIsDirty(Model.ASSIGNMENT_FLAG)){
             long courseNumber = this.getIntent().getLongExtra("COURSE_NUMBER", 0);
             int courseIndex = this.getIntent().getIntExtra("COURSE_INDEX", 0);
+            String courseId = this.getIntent().getStringExtra("COURSE_ID");
 
-            final List<Assignment> list = m.getAssignmentsForCourse(courseIndex);
+            final List<Assignment> list = m.getAssignmentsForCourse(courseId);
             final AssignmentsAdapter aa = new AssignmentsAdapter(this, list);
+            aa.notifyDataSetChanged();
             if (list.isEmpty()) {
                 DataFetcher fetcher = new DataFetcher(((BaseApplication)getApplicationContext()).getToken());
                 try {

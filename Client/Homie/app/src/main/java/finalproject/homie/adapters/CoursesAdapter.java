@@ -31,6 +31,7 @@ public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder>
         public TextView txtNumber;
         protected long courseNumber = 0;
         protected int position = 0;
+        protected String courseId;
 
         public CourseViewHolder(View view) {
             super(view);
@@ -45,6 +46,7 @@ public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder>
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             intent.putExtra("COURSE_NUMBER", courseNumber);
             intent.putExtra("COURSE_INDEX", position);
+            intent.putExtra("COURSE_ID", courseId);
             v.getContext().startActivity(intent);
         }
     }
@@ -92,6 +94,7 @@ public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder>
         holder.txtNumber.setText(String.valueOf(course.getNumber()));
         holder.courseNumber = course.getNumber();
         holder.position = position;
+        holder.courseId = course.getID();
     }
 
     @Override

@@ -34,6 +34,7 @@ import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
 import finalproject.homie.DO.Assignment;
 import finalproject.homie.DO.BusinessEntity;
 import finalproject.homie.DO.Course;
+import finalproject.homie.DO.Task;
 import finalproject.homie.adapters.BaseAdapter;
 import finalproject.homie.controllers.BaseApplication;
 import finalproject.homie.controllers.IDataResponseHandler;
@@ -59,6 +60,11 @@ public class DataAppender {
     public void addAssignment(Assignment assignment, IDataResponseHandler handler) {
         String url = baseUrl + "api/assignments";
         new AppendDataTask<Assignment>(assignment, token, handler).execute(url, "POST");
+    }
+
+    public void addTask(Task task, IDataResponseHandler handler) {
+        String url = baseUrl + "api/tasks";
+        new AppendDataTask<Task>(task, token, handler).execute(url, "POST");
     }
 
     private static class AppendDataTask<T extends BusinessEntity> extends AsyncTask<String, Integer, StatusLine> {
@@ -102,6 +108,7 @@ public class DataAppender {
                 // add request header
                 request.addHeader("Content-type", "application/json");
                 request.addHeader("token", token);
+                request.addHeader("homie_foreign_ids", obj.getForeignIdFields());
                 request.setEntity(new StringEntity(obj.toJSON().toString(), ContentType.APPLICATION_JSON));
                 HttpResponse response = client.execute(request);
 

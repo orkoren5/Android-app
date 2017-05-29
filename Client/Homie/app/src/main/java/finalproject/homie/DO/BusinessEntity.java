@@ -58,4 +58,8 @@ public abstract class BusinessEntity extends BaseObservable{
 
     public abstract JSONObject toJSON() throws JSONException;
 
+    /**
+     * gets a all names of fields of foreign keys, as a string, divided by commas
+     */
+    public abstract String getForeignIdFields();
 }

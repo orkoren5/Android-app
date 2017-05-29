@@ -21,12 +21,14 @@ public class Model {
     public static final int COURSES_FLAG = 0x02;
     public static final int TASKS_FLAG = 0x04;
 
-    List<Course> myCourses = new ArrayList<>();
-    List<Assignment> myAssignments = new ArrayList<>();
-    HashMap<String, List<Task>> tasks = new HashMap<>();
-    Assignment selectedAssignment = null;
-    String rawData;
-    int dirtyFalgs = 0;
+    private List<Course> myCourses = new ArrayList<>();
+    private List<Assignment> myAssignments = new ArrayList<>();
+    private HashMap<String, List<Task>> tasks = new HashMap<>();
+    private HashMap<String, List<Assignment>> assignments = new HashMap<>();
+    private Assignment selectedAssignment = null;
+    private Task selectedTask = null;
+    private String rawData;
+    private int dirtyFalgs = 0;
 
     /**
      * Creates a new empty model
@@ -45,8 +47,13 @@ public class Model {
         return myAssignments;
     }
 
-    public List<Assignment> getAssignmentsForCourse(int courseIndex) {
-        return myCourses.get(courseIndex).getAssignmentList();
+    public List<Assignment> getAssignmentsForCourse(String courseId) {
+        List<Assignment> list = assignments.get(courseId);
+        if (list == null) {
+            list = new ArrayList<>();
+            assignments.put(courseId, list);
+        }
+        return list;
     }
 
     public List<Task> getTasksForAssignment(String assignmentId) {
@@ -61,13 +68,33 @@ public class Model {
     public void updateTasksForAssignment(Assignment a) {
         tasks.put(a.getID(), a.getTasks());
     }
+
     public void setSelectedAssignment(Assignment selectedAssignment) {
         this.selectedAssignment = selectedAssignment;
     }
 
+    public void setSelectedTask(Task task) {
+        this.selectedTask = task;
+    }
+
     public void addAssignment(Assignment a) {
-        this.myAssignments.add(a);
+        List<Assignment> list = assignments.get(a.getRelatedCourse().getID());
+        if (list == null) {
+            list = new ArrayList<>();
+            assignments.put(a.getRelatedCourse().getID(), list);
+        }
+        list.add(a);
         dirtyFalgs |= ASSIGNMENT_FLAG;
+    }
+
+    public void addTask(Task t) {
+        List<Task> list = tasks.get(t.getAssignmentId());
+        if (list == null) {
+            list = new ArrayList<>();
+            tasks.put(t.getAssignmentId(), list);
+        }
+        list.add(t);
+        dirtyFalgs |= TASKS_FLAG;
     }
 
     public void setDirty(int flag) {
@@ -89,6 +116,20 @@ public class Model {
 
     public Assignment getSelectedAssignment() {
         return this.selectedAssignment;
+    }
+
+    public Task getSelectedTask() {
+        Task t = new Task();
+        Assignment a = new Assignment();
+        t.setRelatedAssignment(a);
+        t.setAssignmentId("592a830ed56cbc026e46da44");
+        a.setID("592a830ed56cbc026e46da44");
+        t.setTitle("task title");
+        t.setDaysAssessment(1);
+        t.setDescription("task description");
+        t.setStatus(Task.Status.TODO);
+        return t;
+        //return this.selectedTask;
     }
 }
 

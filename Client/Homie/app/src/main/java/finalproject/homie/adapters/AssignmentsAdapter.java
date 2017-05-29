@@ -1,6 +1,7 @@
 package finalproject.homie.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ import finalproject.homie.DO.Assignment;
 import finalproject.homie.R;
 import finalproject.homie.controllers.BaseApplication;
 import finalproject.homie.controllers.IDataResponseHandler;
+import finalproject.homie.controllers.MyAssignments;
+import finalproject.homie.controllers.TaskList;
 
 /**
  * Created by I311044 on 02/03/2017.
@@ -26,14 +29,24 @@ public class AssignmentsAdapter extends BaseAdapter<AssignmentsAdapter.Assignmen
 
     List<Assignment> assignments;
 
-    public class AssignmentsViewHolder extends RecyclerView.ViewHolder {
+    public class AssignmentsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView txtDeadLine;
         public TextView txtNumber;
+        protected String assignmentId;
 
         public AssignmentsViewHolder(View view) {
             super(view);
             txtDeadLine = (TextView) view.findViewById(R.id.txtDeadLine);
             txtNumber = (TextView) view.findViewById(R.id.txtNumber);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(v.getContext(), TaskList.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            intent.putExtra("ASSIGNMENT_ID", assignmentId);
+            v.getContext().startActivity(intent);
         }
     }
 
@@ -66,6 +79,7 @@ public class AssignmentsAdapter extends BaseAdapter<AssignmentsAdapter.Assignmen
         String sDate = f.format(assignment.getDeadline());
         holder.txtDeadLine.setText(res.getString(R.string.deadline, sDate));
         holder.txtNumber.setText(res.getString(R.string.assignment_no, assignment.getNumber()));
+        holder.assignmentId = assignment.getID();
     }
 
     @Override

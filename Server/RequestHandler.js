@@ -7,7 +7,16 @@ function getColName(sEntityName) {
 	return sEntityName;
 }
 
-function checkValidity(sEntityName, oObject) {
+function checkValidity(sEntityName, oObject, sForeignIds) {
+	if (sForeignIds) {
+		var fields = sForeignIds.split(",");
+		for (var i = 0; i < fields.length; i++) {
+			var strId = oObject[fields[i]];
+			if (strId) {
+				oObject[fields[i]] = convertHexToObjectID(strId);
+			}
+		}
+	}
 	return true;
 }
 
@@ -146,11 +155,12 @@ var handleGetAssignmentsRequest = function(req, responseStream) {
 
 var handlePostRequest = function(sEntityName, req, responseStream) {
 	var oObject = req.body;
+	var sForeignIds = req.headers["homie-foreign-ids"];
 	var colName = getColName(sEntityName);
 	MongoClient.connect(sUrl, function(err, db) {	
 		var col = db.collection(colName);
-		if (checkValidity(colName, oObject)) {
-			oObject.owner = req.user._id.toString();
+		if (checkValidity(colName, oObject, sForeignIds)) {
+			oObject.owner = req.user._id.toString();			
 			col.insertOne(oObject, function(err, result) {
 				if (responseStream) {
 					responseStream.send(oObject._id.toString());
@@ -179,10 +189,11 @@ var handlePostAssignmentsRequest = function(req, responseStream) {
 var handlePutRequest = function(sEntityName, req, responseStream) {
 	var oFieldsToUpdate = req.body,
 		colName = getColName(sEntityName);
-		sObjectId = req.params.id;
+		sObjectId = req.params.id,
+		sForeignIds = req.headers["homie-foreign-ids"];
 	MongoClient.connect(sUrl, function(err, db) {	
 		var col = db.collection(colName);
-		if (checkValidity(colName, oFieldsToUpdate)) {
+		if (checkValidity(colName, oFieldsToUpdate, sForeignIds)) {
 			col.update({_id: convertHexToObjectID(sObjectId)}, {
 				$set: oFieldsToUpdate,
 				$currentDate: { "lastModified": true }
@@ -226,5 +237,6 @@ exports.handlePutRequest = handlePutRequest;
 exports.handleDeleteRequest = handleDeleteRequest;
 exports.handleLoginRequest = handleLoginRequest;
 exports.handleSignUpRequest = handleSignUpRequest;
+
 
 

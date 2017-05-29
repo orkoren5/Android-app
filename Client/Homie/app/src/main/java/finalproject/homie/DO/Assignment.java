@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -29,11 +30,13 @@ import finalproject.homie.DO.Bindables.*;
 
 public class Assignment extends BusinessEntity {
     private long courseNumber;
+    private String courseId;
     private int number;
     private Date deadline = new Date(0);
     private int daysAssessment;
     private Course relatedCourse;
-    private List<Task> tasks;
+    private List<String> users = new ArrayList<>();
+    private List<Task> tasks = new ArrayList<>();
 
     private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -75,6 +78,14 @@ public class Assignment extends BusinessEntity {
         notifyPropertyChanged(BR.daysAssessment);
     }
 
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
     public Course getRelatedCourse() {
         return relatedCourse;
     }
@@ -94,8 +105,14 @@ public class Assignment extends BusinessEntity {
         json.put("number", number);
         json.put("deadline", Assignment.format.format(deadline));
         json.put("daysAssessment", daysAssessment);
+        json.put("couresId", courseId);
         json.put("approvedValid", true);
         return json;
+    }
+
+    @Override
+    public String getForeignIdFields() {
+        return "couresId";
     }
 
     @Override
@@ -104,6 +121,9 @@ public class Assignment extends BusinessEntity {
         this.setCourseNumber(json.getLong("courseNumber"));
         this.setDaysAssessment(json.getInt("daysAssessment"));
         this.setNumber(json.getInt("number"));
+        if (json.has("courseId")) {
+            this.setCourseId(json.getString("courseId"));
+        }
         try {
             this.setDeadline(format.parse(json.getString("deadline")));
         }
