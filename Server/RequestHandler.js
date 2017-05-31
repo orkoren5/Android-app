@@ -176,6 +176,7 @@ var handlePostAssignmentsRequest = function(req, responseStream) {
 
 	var clonedReq = {
 		body: clone(req.body),
+		headers: clone(req.headers),
 		user: clone(req.user)
 	};
 
