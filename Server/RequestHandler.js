@@ -157,7 +157,7 @@ var handleGetAssignmentsRequest = function(req, responseStream) {
 		{"$project": {"userObjects.password": 0, "users": 0, "userObjects.groupIds": 0, "userObjects.assignmentIds": 0}},
 		{"$group": {
 			"_id": "$_id",
-			"courseId": {$first: "$courseId"},
+			"courseNumber": {$first: "$courseNumber"},
 			"number": {$first: "$number"},
 			"deadline": {$first: "$deadline"},
 			"daysAssessment": {$first: "$daysAssessment"},
