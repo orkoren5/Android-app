@@ -8,6 +8,7 @@ function getColName(sEntityName) {
 }
 
 function checkValidity(sEntityName, oObject, sForeignIds) {
+	delete oObject["_id"];
 	if (sForeignIds) {
 		var fields = sForeignIds.split(",");
 		for (var i = 0; i < fields.length; i++) {
@@ -221,12 +222,16 @@ var handlePutRequest = function(sEntityName, req, responseStream) {
 				$set: oFieldsToUpdate,
 				$currentDate: { "lastModified": true }
 			},	function(err, result) {
-				var message = result.result.nModified > 0 
-					? "Object was modified successfully" 
-					: "Object modification failed - object ID does not exist";
-				var status = result.result.nModified > 0 ? 200 : 400;
-				responseStream.status(status).send(message);
-				console.log(status + ": " + message);
+				if (!err) {
+					var message = result.result.nModified > 0 
+						? "Object was modified successfully" 
+						: "Object modification failed - object ID does not exist";
+					var status = result.result.nModified > 0 ? 200 : 400;
+					responseStream.status(status).send(message);
+					console.log(status + ": " + message);
+				} else {
+					console.log(err.message);
+				}				
 			    db.close();
 			});
 		}	
