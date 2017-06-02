@@ -251,6 +251,31 @@ var handleDeleteRequest = function(sEntityName, req, responseStream) {
 	});
 };
 
+var handlePostAddOrDeleteUserToAssignment = function(req, responseStream) {
+	var oFields = req.body,
+		sObjectId = req.params.id;
+	MongoClient.connect(sUrl, function(err, db) {
+		var col = db.collection("users");
+		col.findOne({"name" : oFields.name}, function(err, item) {
+			if (!item) {
+				responseStream.status(400).send("user " + oFields.name + " doesn't exit");
+		    	db.close();
+			} else {
+				var updateParam = oFields.isAdd ? {"$addToSet" : {"users" : item._id}} : {"$pull" : {"users" : item._id}};
+				db.collection("assignments").update({"_id" : convertHexToObjectID(sObjectId)}, updateParam, function (err, result) {
+					var message = result.result.n > 0 
+						? "User was deleted successfully" 
+						: "User addition failed - assignment ID does not exist";
+					var status = result.result.n > 0 ? 200 : 400;
+					responseStream.status(status).send(message);
+					console.log(status + ": " + message);
+					db.close();
+				});
+			}		
+	  	});
+	});
+}
+
 exports.handleGetByIdRequest = handleGetByIdRequest;
 exports.handleGetRequest = handleGetRequest;
 exports.handleGetAssignmentsRequest = handleGetAssignmentsRequest;
@@ -260,6 +285,7 @@ exports.handlePutRequest = handlePutRequest;
 exports.handleDeleteRequest = handleDeleteRequest;
 exports.handleLoginRequest = handleLoginRequest;
 exports.handleSignUpRequest = handleSignUpRequest;
+exports.handlePostAddOrDeleteUserToAssignment = handlePostAddOrDeleteUserToAssignment;
 
 
 
