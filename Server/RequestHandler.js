@@ -148,7 +148,7 @@ var handleGetAssignmentsRequest = function(req, responseStream) {
 			foreignField: "_id", 
 			as: "userObjects"
 		}},
-		{"$project": {"userObjects": { "$arrayElemAt": [ "$userObjects", 0 ] }}},
+		{"$project": {"courseNumber":1,"number":1,"deadline":1,"daysAssessment":1,"owner":1,"userObjects": { "$arrayElemAt": [ "$userObjects", 0 ] }}},
 		{"$group": {
 			"_id": "$_id",
 			"courseNumber": {$first: "$courseNumber"},
