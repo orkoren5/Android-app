@@ -124,14 +124,15 @@ var handleGetRequest = function(sEntityName, req, responseStream) {
 var _handleGetRequestWithLookup = function(sEntityName, req, responseStream) {
 	var colName = getColName(sEntityName);
 	var query = req.query;
-	var lookup = req.lookup;
+	var aggregattion = req.aggregattion;
+	aggregattion.unshift({ "$match": parseQuery(query) });
 	MongoClient.connect(sUrl, function(err, db) {
 		var col = db.collection(colName);
 		if (Object.getOwnPropertyNames(query).length === 0) {
 			query.owner = req.user._id.toString();
 		}
 		console.log(req.query);
-		col.aggregate([{ "$match": parseQuery(query) }, {"$lookup": lookup}]).toArray(function(err, items) {
+		col.aggregate(aggregattion).toArray(function(err, items) {
 			responseStream.json(items);
 		    db.close();
 	  	});
@@ -139,16 +140,36 @@ var _handleGetRequestWithLookup = function(sEntityName, req, responseStream) {
 };
 
 var handleGetAssignmentsRequest = function(req, responseStream) {
+	req.aggregattion = [
+		{"$unwind": "$users"},
+		{"$lookup": {
+			from: "users", 
+			localField: "users", 
+			foreignField: "_id", 
+			as: "userObjects"
+		}},
+		{"$lookup" : {
+			from: "tasks", 
+			localField: "_id", 
+			foreignField: "assignmentId", 
+			as: "tasks"
+		}},
+		{"$project": {"userObjects.password": 0, "users": 0, "userObjects.groupIds": 0, "userObjects.assignmentIds": 0}},
+		{"$group": {
+			"_id": "$_id",
+			"courseId": {$first: "$courseId"},
+			"number": {$first: "$number"},
+			"deadline": {$first: "$deadline"},
+			"daysAssessment": {$first: "$daysAssessment"},
+			"owner": {$first: "$owner"},
+			"userObjects": {$push: "$userObjects"}
+		}}
+	];
+
 	req.query["users"] = {
 		"$in" : [
-			req.user._id.toString()
+			convertHexToObjectID(req.user._id)
 		]
-	};
-	req["lookup"] = {
-		from: "tasks", 
-		localField: "_id", 
-		foreignField: "assignmentId", 
-		as: "tasks"
 	};
 	_handleGetRequestWithLookup("assignments", req, responseStream);
 }
