@@ -148,7 +148,7 @@ var handleGetAssignmentsRequest = function(req, responseStream) {
 			foreignField: "_id", 
 			as: "userObjects"
 		}},
-		{"$project": {"userObjects.password": 0, "users": 0, "userObjects.groupIds": 0, "userObjects.assignmentIds": 0}},
+		{"$project": {"userObjects": { "$arrayElemAt": [ "$userObjects", 0 ] }}},
 		{"$group": {
 			"_id": "$_id",
 			"courseNumber": {$first: "$courseNumber"},
@@ -158,6 +158,7 @@ var handleGetAssignmentsRequest = function(req, responseStream) {
 			"owner": {$first: "$owner"},
 			"userObjects": {$push: "$userObjects"}
 		}},
+		{"$project": {"userObjects.password": 0, "users": 0, "userObjects.groupIds": 0, "userObjects.assignmentIds": 0}},
 		{"$lookup" : {
 			from: "tasks", 
 			localField: "_id", 
