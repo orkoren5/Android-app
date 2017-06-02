@@ -126,6 +126,10 @@ apiRoutes.post('/assignments', function(req, response) {
 });
 
 
+apiRoutes.post('/addOrDeleteUserToAssignment/:id', function(req, response) {
+  handler.handlePostAddOrDeleteUserToAssignment(req, response);
+});
+
 //////////////////////////////////////////////////////////
 // PUT request enpoints
 //////////////////////////////////////////////////////////
