@@ -204,7 +204,7 @@ var handlePostAssignmentsRequest = function(req, responseStream) {
 	delete req.body["users"];
 	handlePostRequest("assignments", req);
 
-	clonedReq.body["users"] = [ clonedReq.user._id.toString() ]; // Add selft to users list
+	clonedReq.body["users"] = [ convertHexToObjectID(clonedReq.user._id) ]; // Add self to users list
 	handlePostRequest("assignments", clonedReq, responseStream);
 };
 
