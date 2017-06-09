@@ -1,5 +1,7 @@
 package finalproject.homie.controllers;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -11,6 +13,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import finalproject.homie.DO.BusinessEntity;
+import finalproject.homie.DO.Course;
 import finalproject.homie.R;
 import finalproject.homie.adapters.CoursesAdapter;
 import finalproject.homie.model.Model;
@@ -48,10 +52,19 @@ public class MyCourses extends BaseNavigationActivity
         super.onResume();
 
         if (this.getIntent().getBooleanExtra("RELOAD_DATA", false)){
-            Model m = ((BaseApplication) getApplication()).getModel();
-
-            CoursesAdapter ca = new CoursesAdapter(this, m.getMyCourses());
-            if (m.getMyCourses().isEmpty()) {
+            final Model model = ((BaseApplication) getApplication()).getModel();
+            final Context me = this;
+            CoursesAdapter ca = new CoursesAdapter(this, model.getMyCourses(), new IEntityClickListener() {
+                @Override
+                public void onClick(BusinessEntity obj) {
+                    model.setSelectedCourse((Course)obj);
+                    Intent intent = new Intent(me, MyAssignments.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    intent.putExtra("COURSE_ID", obj.getID());
+                    startActivity(intent);
+                }
+            });
+            if (model.getMyCourses().isEmpty()) {
                 ca.fetchDataFromBH();
             }
             RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);

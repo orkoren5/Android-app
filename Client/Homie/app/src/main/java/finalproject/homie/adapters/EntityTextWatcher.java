@@ -2,6 +2,9 @@ package finalproject.homie.adapters;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +19,7 @@ import finalproject.homie.DO.BusinessEntity;
  * Created by I311044 on 26/05/2017.
  */
 
-public class EntityTextWatcher implements TextWatcher {
+public class EntityTextWatcher implements TextWatcher, OnItemSelectedListener {
 
     BusinessEntity obj;
     Method method;
@@ -88,6 +91,27 @@ public class EntityTextWatcher implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable s) {
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        try {
+            if (type.isEnum()) {
+                Object param = type.getMethod("valueOf", int.class).invoke(type, position + 1);
+                method.invoke(this.obj, param);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
 
     }
 }

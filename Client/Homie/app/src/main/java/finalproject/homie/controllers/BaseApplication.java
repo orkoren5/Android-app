@@ -2,6 +2,7 @@ package finalproject.homie.controllers;
 
 import android.app.Application;
 
+import finalproject.homie.DO.User;
 import finalproject.homie.model.Model;
 
 /**
@@ -11,6 +12,7 @@ import finalproject.homie.model.Model;
 public class BaseApplication extends Application {
     private Model model;
     private String token = "";
+    private User conntectedUser = null;
 
     public Model getModel() {
         return model;
@@ -26,6 +28,14 @@ public class BaseApplication extends Application {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public User getConnectedUser() {
+        return conntectedUser;
+    }
+
+    public void setConntectedUser(User conntectedUser) {
+        this.conntectedUser = conntectedUser;
     }
 
     @Override

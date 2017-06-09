@@ -14,19 +14,55 @@ import finalproject.homie.BR;
 public class Task extends BusinessEntity {
 
     public enum Status {
-        TODO,
-        IN_PROCESS,
-        DONE
+        TODO(1),
+        IN_PROCESS(2),
+        DONE(3);
+
+        private int value;
+
+        Status(int value) {
+            this.value = value;
+        }
+
+        public int toInt() {
+            return value;
+        }
+
+        public static Status valueOf(int value) {
+            switch (value) {
+                case 1:
+                    return TODO;
+                case 2:
+                    return IN_PROCESS;
+                case 3:
+                    return DONE;
+                default:
+                    return TODO;
+            }
+        }
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case DONE:
+                    return "Done";
+                case IN_PROCESS:
+                    return "In Process";
+                case TODO:
+                    return "To Do";
+                default:
+                    return "No Status";
+            }
+        }
     }
 
-    private String description;
+    private String description = "";
     private String assignmentId;
     private Assignment assignment;
-    private String groupId;
-    private String title;
+    private String title = "";
     private int daysAssessment;
-    private Status status;
-    private String assignedUserId;
+    private Status status = Status.TODO;
+    private String assignedUserId = "";
 
     @Bindable
     public Status getStatus() {
@@ -64,6 +100,7 @@ public class Task extends BusinessEntity {
         this.description = description;
     }
 
+    @Bindable
     public int getDaysAssessment() {
         return daysAssessment;
     }
@@ -92,10 +129,11 @@ public class Task extends BusinessEntity {
 
     @Override
     public BusinessEntity parseJSON(JSONObject json) throws JSONException {
+        this.id = json.getString("_id");
         this.title = json.getString("title");
         this.description = json.getString("description");
         this.daysAssessment = json.getInt("daysAssessment");
-        this.status = Status.TODO; // TODO: get status
+        this.status = Status.valueOf(json.getInt("status"));
         this.assignedUserId = json.getString("assignedUserId");
         this.assignmentId = json.getString("assignmentId");
 
@@ -105,9 +143,13 @@ public class Task extends BusinessEntity {
     @Override
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
+        if (id != null) {
+            json.put("_id", id);
+        }
         json.put("title", title);
         json.put("description", description);
-        json.put("status", 1);
+        json.put("status", status.value);
+        json.put("daysAssessment", daysAssessment);
         json.put("assignedUserId", assignedUserId);
         json.put("assignmentId", assignmentId);
         return json;

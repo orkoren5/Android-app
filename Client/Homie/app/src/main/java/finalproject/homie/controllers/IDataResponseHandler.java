@@ -8,5 +8,5 @@ public interface IDataResponseHandler {
 
     void OnError(int errorCode);
 
-    void OnSuccess();
+    void OnSuccess(String message);
 }

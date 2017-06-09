@@ -2,7 +2,9 @@ package finalproject.homie.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import java.util.List;
 import finalproject.homie.DAL.DataFetcher;
 import finalproject.homie.DO.Assignment;
 import finalproject.homie.DO.Task;
+import finalproject.homie.DO.Task.Status;
 import finalproject.homie.R;
 import finalproject.homie.controllers.BaseApplication;
 import finalproject.homie.controllers.EditTask;
@@ -75,7 +78,22 @@ public class TasksAdapter extends BaseAdapter<TasksAdapter.TasksViewHolder> {
         Resources res = this.context.getResources();
         holder.txtTitle.setText(task.getTitle());
         holder.txtDaysAssessment.setText(res.getString(R.string.days_assessment, task.getDaysAssessment()));
+        holder.txtStatus.setText(task.getStatus().toString());
+        holder.txtStatus.setTextColor(getStatusColor(task.getStatus()));
         holder.relatedTask = task;
+    }
+
+    private int getStatusColor(Status status) {
+        switch (status) {
+            case TODO:
+                return Color.rgb(206,0,0);
+            case IN_PROCESS:
+                return Color.BLACK;
+            case DONE:
+                return Color.rgb(52,141,58);
+            default:
+                return Color.BLACK;
+        }
     }
 
     @Override

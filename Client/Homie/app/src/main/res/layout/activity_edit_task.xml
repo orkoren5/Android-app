@@ -57,14 +57,11 @@
                 android:layout_gravity="center|end"
                 android:textAlignment="textEnd"
                 />
-            <EditText
-                android:id="@+id/txtDeadLine"
+            <Spinner
+                android:id="@+id/spinner_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/task_status_hint"
-                android:inputType="number"
-                android:text="1"
-                />
+                android:spinnerMode="dialog"/>
         </LinearLayout>
         <LinearLayout
             android:layout_marginTop="10dp"

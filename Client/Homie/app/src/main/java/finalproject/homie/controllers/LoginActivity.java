@@ -3,6 +3,7 @@ package finalproject.homie.controllers;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -28,12 +29,17 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 
-import finalproject.homie.DAL.LoginTask;
+import finalproject.homie.DAL.CallServerFunction;
+import finalproject.homie.DO.User;
 import finalproject.homie.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -48,16 +54,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private LoginTask mAuthTask = null;
-
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private final User connectedUser = new User();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,9 +144,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
 
         // Reset errors.
         mEmailView.setError(null);
@@ -183,8 +182,41 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new LoginTask(this, email, password);
-            mAuthTask.execute(email, password);
+            this.connectedUser.setName(email);
+            final Context me = this;
+            CallServerFunction loginTask = new CallServerFunction("", new IDataResponseHandler() {
+                @Override
+                public void OnError(int errorCode) {
+                    showProgress(false);
+                    if (errorCode == 505) {
+                        Toast.makeText(me, "The server is temporarily down. Please try again later.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void OnSuccess(String result) {
+                    showProgress(false);
+                    String token = "";
+                    boolean success = false;
+                    try {
+                        JSONObject obj = new JSONObject(result);
+                        token = obj.getString("token");
+                        success = obj.getBoolean("success");
+                    } catch (JSONException ex) {
+                        // Do nothing
+                    }
+                    if (success) {
+                        BaseApplication app = ((BaseApplication)getApplication());
+                        app.setToken(token);
+                        app.setConntectedUser(connectedUser);
+                        finish();
+                    } else {
+                        mPasswordView.setError(getString(R.string.error_incorrect_password));
+                        mPasswordView.requestFocus();
+                    }
+                }
+            });
+            loginTask.login(email, password);
         }
     }
 
@@ -297,16 +329,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     public void onLoginRequetReceived(final String token) {
-        showProgress(false);
-        mAuthTask = null;
 
-        if (token != null && !token.isEmpty()) {
-            ((BaseApplication)getApplication()).setToken(token);
-            finish();
-        } else {
-            mPasswordView.setError(getString(R.string.error_incorrect_password));
-            mPasswordView.requestFocus();
-        }
     }
 
 }

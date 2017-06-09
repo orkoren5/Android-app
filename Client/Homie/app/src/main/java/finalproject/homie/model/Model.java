@@ -23,10 +23,11 @@ public class Model {
 
     private List<Course> myCourses = new ArrayList<>();
     private List<Assignment> myAssignments = new ArrayList<>();
-    private HashMap<String, List<Task>> tasks = new HashMap<>();
+    private HashMap<String, TasksHolder> tasks = new HashMap<>();
     private HashMap<String, List<Assignment>> assignments = new HashMap<>();
     private Assignment selectedAssignment = null;
     private Task selectedTask = null;
+    private Course selectedCourse = null;
     private String rawData;
     private int dirtyFalgs = 0;
 
@@ -56,13 +57,13 @@ public class Model {
         return list;
     }
 
-    public List<Task> getTasksForAssignment(String assignmentId) {
-        List<Task> list = tasks.get(assignmentId);
-        if (list == null) {
-            list = new ArrayList<>();
-            tasks.put(assignmentId, list);
+    public TasksHolder getTasksForAssignment(String assignmentId) {
+        TasksHolder lists = tasks.get(assignmentId);
+        if (lists == null) {
+            lists = new TasksHolder();
         }
-        return list;
+        tasks.put(assignmentId, lists);
+        return lists;
     }
 
     public void updateTasksForAssignment(Assignment a) {
@@ -77,6 +78,9 @@ public class Model {
         this.selectedTask = task;
     }
 
+    public void setSelectedCourse(Course course) {
+        this.selectedCourse = course;
+    }
     public void addAssignment(Assignment a) {
         List<Assignment> list = assignments.get(a.getRelatedCourse().getID());
         if (list == null) {
@@ -88,12 +92,26 @@ public class Model {
     }
 
     public void addTask(Task t) {
-        List<Task> list = tasks.get(t.getAssignmentId());
-        if (list == null) {
-            list = new ArrayList<>();
-            tasks.put(t.getAssignmentId(), list);
+        TasksHolder lists = tasks.get(t.getAssignmentId());
+        if (lists == null && t.getRelatedAssignment().getTasks() == null) {
+            lists = new TasksHolder();
+        } else if (lists == null) {
+            lists = t.getRelatedAssignment().getTasks();
         }
-        list.add(t);
+        tasks.put(t.getAssignmentId(), lists);
+        lists.add(t);
+        dirtyFalgs |= TASKS_FLAG;
+    }
+
+    public void taskUpdated(Task t) {
+        TasksHolder lists = tasks.get(t.getAssignmentId());
+        if (lists == null && t.getRelatedAssignment().getTasks() == null) {
+            lists = new TasksHolder();
+        } else if (lists == null) {
+            lists = t.getRelatedAssignment().getTasks();
+        }
+        tasks.put(t.getAssignmentId(), lists);
+        lists.taskUpdated(t);
         dirtyFalgs |= TASKS_FLAG;
     }
 
@@ -118,18 +136,12 @@ public class Model {
         return this.selectedAssignment;
     }
 
+    public Course getSelectedCourse() {
+        return this.selectedCourse;
+    }
+
     public Task getSelectedTask() {
-        Task t = new Task();
-        Assignment a = new Assignment();
-        t.setRelatedAssignment(a);
-        t.setAssignmentId("592a830ed56cbc026e46da44");
-        a.setID("592a830ed56cbc026e46da44");
-        t.setTitle("task title");
-        t.setDaysAssessment(1);
-        t.setDescription("task description");
-        t.setStatus(Task.Status.TODO);
-        return t;
-        //return this.selectedTask;
+        return this.selectedTask;
     }
 }
 

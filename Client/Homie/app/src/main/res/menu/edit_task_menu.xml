@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/action_search"
+        android:title="@string/ass_menu_item_edit"
+        android:icon="@drawable/ic_menu_manage" />
+    <item android:id="@+id/action_settings"
+        android:title="@string/ass_menu_item_tasks"
+        android:icon="@drawable/ic_dashboard_black_24dp" />
+    <item android:id="@+id/action_navigation"
+        android:title="@string/ass_menu_item_group"
+        android:icon="@drawable/ic_home_black_24dp" />
+</menu>

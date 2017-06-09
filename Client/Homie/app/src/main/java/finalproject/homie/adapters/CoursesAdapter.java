@@ -16,6 +16,7 @@ import finalproject.homie.DO.Course;
 import finalproject.homie.R;
 import finalproject.homie.controllers.BaseApplication;
 import finalproject.homie.controllers.IDataResponseHandler;
+import finalproject.homie.controllers.IEntityClickListener;
 import finalproject.homie.controllers.MyAssignments;
 
 /**
@@ -24,7 +25,8 @@ import finalproject.homie.controllers.MyAssignments;
 
 public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder> {
 
-    List<Course> courses;
+    private List<Course> courses;
+    private final IEntityClickListener listener;
 
     public class CourseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView txtName;
@@ -32,6 +34,8 @@ public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder>
         protected long courseNumber = 0;
         protected int position = 0;
         protected String courseId;
+        protected Course course;
+
 
         public CourseViewHolder(View view) {
             super(view);
@@ -42,38 +46,30 @@ public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder>
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(v.getContext(), MyAssignments.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            intent.putExtra("COURSE_NUMBER", courseNumber);
-            intent.putExtra("COURSE_INDEX", position);
-            intent.putExtra("COURSE_ID", courseId);
-            v.getContext().startActivity(intent);
+            listener.onClick(course);
         }
     }
 
-    public CoursesAdapter(Context context, List<Course> courses) {
+    public CoursesAdapter(Context context, List<Course> courses, IEntityClickListener listener) {
         this.courses = courses;
         this.context = context;
+        this.listener = listener;
     }
 
     public void fetchDataFromBH() {
-        DataFetcher fetcher = new DataFetcher(((BaseApplication)context.getApplicationContext()).getToken());
+        String token = ((BaseApplication)context.getApplicationContext()).getToken();
         final CoursesAdapter adapter = this;
-        try {
-            fetcher.getCourses(this.courses, new IDataResponseHandler() {
-                @Override
-                public void OnError(int errorCode) {
-                    // TODO: handle Error
-                }
+        new DataFetcher<Course>(this.courses, token, new IDataResponseHandler() {
+            @Override
+            public void OnError(int errorCode) {
+                // TODO: handle Error
+            }
 
-                @Override
-                public void OnSuccess() {
-                    adapter.notifyDataSetChanged();
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            @Override
+            public void OnSuccess(String message) {
+                adapter.notifyDataSetChanged();
+            }
+        }).getCourses();
     }
 
     public void setOnItemClickListener(View.OnClickListener listener) {
@@ -95,6 +91,7 @@ public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder>
         holder.courseNumber = course.getNumber();
         holder.position = position;
         holder.courseId = course.getID();
+        holder.course = course;
     }
 
     @Override

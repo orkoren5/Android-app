@@ -28,12 +28,14 @@ public abstract class BaseNavigationActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                additem();
-            }
-        });
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    additem();
+                }
+            });
+        }
     }
 
     protected abstract void additem();
@@ -46,6 +48,14 @@ public abstract class BaseNavigationActivity extends AppCompatActivity
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         }
+    }
+
+    protected void logout() {
+        ((BaseApplication) getApplication()).setToken("");
+        ((BaseApplication) getApplication()).getConnectedUser().setName("");
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(intent);
     }
 
     @Override
@@ -62,6 +72,15 @@ public abstract class BaseNavigationActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.navigaion, menu);
+        if (menu.getItem(0) != null) {
+            menu.getItem(0).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    logout();
+                    return true;
+                }
+            });
+        }
         return true;
     }
 

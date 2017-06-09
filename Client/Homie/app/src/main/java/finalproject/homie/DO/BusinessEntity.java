@@ -11,10 +11,10 @@ import org.json.JSONObject;
  */
 
 public abstract class BusinessEntity extends BaseObservable{
-    private String ID;
+    protected String id;
 
     public String getID() {
-        return ID;
+        return id;
     }
 
     public static class Factory<T extends BusinessEntity> {
@@ -32,8 +32,8 @@ public abstract class BusinessEntity extends BaseObservable{
         }
     }
 
-    public void setID(String ID) {
-        this.ID = ID;
+    public void setID(String id) {
+        this.id = id;
     }
 
     @Nullable
@@ -51,7 +51,7 @@ public abstract class BusinessEntity extends BaseObservable{
 
     @Override
     public int hashCode() {
-        return ID.hashCode();
+        return id.hashCode();
     }
 
     public abstract BusinessEntity parseJSON(JSONObject json) throws  JSONException;

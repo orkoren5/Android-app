@@ -1,101 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
             name="assignment"
             type="finalproject.homie.DO.Assignment">
         </variable>
     </data>
-    <LinearLayout
-        android:orientation="vertical"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/title"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:openDrawer="start">
+        <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:text="@{@string/ass_name(assignment.relatedCourse.name, assignment.number)}"
-            />
+            android:fitsSystemWindows="true"
+            tools:context=".controllers.BaseNavigationActivity">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="?attr/actionBarSize">
 
-        <LinearLayout
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_marginRight="10dp"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="@string/ass_no_hint"
-                android:layout_gravity="end|center"
-                android:textAlignment="textEnd"
-                />
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="@{@string/ass_name(assignment.relatedCourse.name, assignment.number)}"
+                    />
 
-            <EditText
-                android:id="@+id/txtNumber"
+                <LinearLayout
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_marginRight="10dp"
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ass_no_hint"
+                        android:layout_gravity="end|center"
+                        android:textAlignment="textEnd"
+                        />
+
+                    <EditText
+                        android:id="@+id/txtNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/ass_no_hint"
+                        android:text="@{String.valueOf(assignment.number)}"
+                        android:inputType="number"
+                        />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_marginRight="10dp"
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ass_deadline_hint"
+                        android:layout_gravity="center|end"
+                        android:textAlignment="textEnd"
+                        />
+                    <EditText
+                        android:id="@+id/txtDeadLineDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/ass_date_hint"
+                        android:inputType="datetime"
+                        android:onClick="showDatePickerDialog"
+                        android:text="@{@string/date_format(assignment.deadline)}"
+                        />
+                    <EditText
+                        android:id="@+id/txtDeadLineTime"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/ass_time_hint"
+                        android:inputType="datetime"
+                        android:onClick="showDatePickerDialog"
+                        />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_marginRight="10dp"
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ass_days_assess_hint"
+                        android:layout_gravity="end|center"
+                        android:textAlignment="textEnd"
+                        />
+                    <EditText
+                        android:id="@+id/txtDateAssessment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/ass_days_assess_hint"
+                        android:inputType="number"
+                        android:text="@{String.valueOf(assignment.daysAssessment)}"
+                        />
+
+                </LinearLayout>
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|bottom"
+                    android:layout_margin="@dimen/fab_margin"
+                    app:srcCompat="@android:drawable/ic_input_add" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <android.support.design.widget.BottomNavigationView
+                    android:id="@+id/bottom_navigation"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_gravity="end|bottom"
+                    app:menu="@menu/edit_task_menu" />
+            </LinearLayout>
+
+
+            <android.support.design.widget.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/ass_no_hint"
-                android:text="@{String.valueOf(assignment.number)}"
-                android:inputType="number"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_marginRight="10dp"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="@string/ass_no_hint"
-                android:layout_gravity="center|end"
-                android:textAlignment="textEnd"
-                />
-            <EditText
-                android:id="@+id/txtDeadLine"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/ass_deadline_hint"
-                android:inputType="date"
-                android:text="@{@string/date_format(assignment.deadline)}"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_marginRight="10dp"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="@string/ass_days_assess_hint"
-                android:layout_gravity="end|center"
-                android:textAlignment="textEnd"
-                />
-            <EditText
-                android:id="@+id/txtDateAssessment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/ass_days_assess_hint"
-                android:inputType="number"
-                android:text="@{String.valueOf(assignment.daysAssessment)}"
-                />
+                android:theme="@style/AppTheme.AppBarOverlay">
 
-        </LinearLayout>
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@android:drawable/ic_input_add" />
-    </LinearLayout>
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+            </android.support.design.widget.AppBarLayout>
+        </android.support.design.widget.CoordinatorLayout>
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_navigaion"
+        app:menu="@menu/activity_navigaion_drawer" />
+    </android.support.v4.widget.DrawerLayout>
 </layout>

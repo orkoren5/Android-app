@@ -32,13 +32,17 @@ public class Assignment extends BusinessEntity {
     private long courseNumber;
     private String courseId;
     private int number;
-    private Date deadline = new Date(0);
+    private Date deadline = new Date();
     private int daysAssessment;
     private Course relatedCourse;
-    private List<String> users = new ArrayList<>();
-    private List<Task> tasks = new ArrayList<>();
+    private final List<User> users = new EntityArrayList<>();
+    private TasksHolder tasks = new TasksHolder();
 
     private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+    public List<User> getUsers() {
+        return users;
+    }
 
     public long getCourseNumber() {
         return courseNumber;
@@ -94,13 +98,16 @@ public class Assignment extends BusinessEntity {
         this.relatedCourse = relatedCoures;
     }
 
-    public List<Task> getTasks() {
+    public TasksHolder getTasks() {
         return tasks;
     }
 
     @Override
     public JSONObject toJSON() throws JSONException{
         JSONObject json = new JSONObject();
+        if (id != null) {
+            json.put("_id", id);
+        }
         json.put("courseNumber", courseNumber);
         json.put("number", number);
         json.put("deadline", Assignment.format.format(deadline));
@@ -131,12 +138,22 @@ public class Assignment extends BusinessEntity {
             ex.printStackTrace();
             this.setDeadline(new Date(0));
         }
-        JSONArray arr = json.getJSONArray("tasks");
-        for (int i = 0; i < arr.length(); i++) {
+
+        JSONArray tasksArr = json.getJSONArray("tasks");
+        for (int i = 0; i < tasksArr.length(); i++) {
             Task t = new Task();
-            t.parseJSON(arr.getJSONObject(i));
+            t.parseJSON(tasksArr.getJSONObject(i));
+            t.setRelatedAssignment(this);
             tasks.add(t);
         }
+
+        JSONArray groupArr = json.getJSONArray("userObjects");
+        for (int i = 0; i < groupArr.length(); i++) {
+            User u = new User();
+            u.parseJSON(groupArr.getJSONObject(i));
+            users.add(u);
+        }
+
         return this;
     }
 }

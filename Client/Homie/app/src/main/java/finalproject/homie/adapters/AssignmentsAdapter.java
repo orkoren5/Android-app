@@ -18,6 +18,7 @@ import finalproject.homie.DO.Assignment;
 import finalproject.homie.R;
 import finalproject.homie.controllers.BaseApplication;
 import finalproject.homie.controllers.IDataResponseHandler;
+import finalproject.homie.controllers.IEntityClickListener;
 import finalproject.homie.controllers.MyAssignments;
 import finalproject.homie.controllers.TaskList;
 
@@ -27,12 +28,13 @@ import finalproject.homie.controllers.TaskList;
 
 public class AssignmentsAdapter extends BaseAdapter<AssignmentsAdapter.AssignmentsViewHolder> {
 
-    List<Assignment> assignments;
+    private List<Assignment> assignments;
+    private final IEntityClickListener listener;
 
     public class AssignmentsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView txtDeadLine;
-        public TextView txtNumber;
-        protected String assignmentId;
+        protected TextView txtDeadLine;
+        protected TextView txtNumber;
+        protected Assignment assignment;
 
         public AssignmentsViewHolder(View view) {
             super(view);
@@ -43,16 +45,14 @@ public class AssignmentsAdapter extends BaseAdapter<AssignmentsAdapter.Assignmen
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(v.getContext(), TaskList.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            intent.putExtra("ASSIGNMENT_ID", assignmentId);
-            v.getContext().startActivity(intent);
+            listener.onClick(assignment);
         }
     }
 
-    public AssignmentsAdapter(Context context, List<Assignment> assignments) {
+    public AssignmentsAdapter(Context context, List<Assignment> assignments, IEntityClickListener listener) {
         this.assignments = assignments;
         this.context = context;
+        this.listener = listener;
     }
 
     public void fetchDataFromBH(IDataResponseHandler handler) {
@@ -79,7 +79,7 @@ public class AssignmentsAdapter extends BaseAdapter<AssignmentsAdapter.Assignmen
         String sDate = f.format(assignment.getDeadline());
         holder.txtDeadLine.setText(res.getString(R.string.deadline, sDate));
         holder.txtNumber.setText(res.getString(R.string.assignment_no, assignment.getNumber()));
-        holder.assignmentId = assignment.getID();
+        holder.assignment = assignment;
     }
 
     @Override

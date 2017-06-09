@@ -5,10 +5,14 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import finalproject.homie.DAL.DataAppender;
@@ -19,6 +23,7 @@ import finalproject.homie.adapters.EntityTextWatcher;
 import finalproject.homie.databinding.ActivityEditTaskBinding;
 import finalproject.homie.model.Model;
 
+import static finalproject.homie.DO.Task.*;
 import static finalproject.homie.R.layout.activity_edit_task;
 
 public class EditTask extends AppCompatActivity {
@@ -32,6 +37,7 @@ public class EditTask extends AppCompatActivity {
 
         Model m = ((BaseApplication)getApplication()).getModel();
         final Task ctx = m.getSelectedTask();
+        final boolean isNew = getIntent().getBooleanExtra("IS_NEW", true);
         binding.setTask(ctx);
 
         EditText txtTitle = (EditText)findViewById(R.id.txtTitle);
@@ -40,35 +46,42 @@ public class EditTask extends AppCompatActivity {
         EditText txtDays = (EditText)findViewById(R.id.txtDaysAssessment);
         txtDays.addTextChangedListener(new EntityTextWatcher(ctx, "setDaysAssessment", int.class));
 
-        EditText txtDescription = (EditText)findViewById(R.id.txtDeadLine);
+        EditText txtDescription = (EditText)findViewById(R.id.txtDescription);
         txtDescription.addTextChangedListener(new EntityTextWatcher(ctx, "setDescription", String.class));
+
+        Spinner spinner = (Spinner) findViewById(R.id.spinner_status);
+        spinner.setAdapter(new ArrayAdapter<Status>(this, android.R.layout.simple_list_item_1, Status.values()));
+        spinner.setOnItemSelectedListener(new EntityTextWatcher(ctx, "setStatus", Status.class));
+        spinner.setSelection(ctx.getStatus().toInt() - 1);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String token = ((BaseApplication)getApplicationContext()).getToken();
-                token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1OTI5ZjdlZGRjZGQwMTc4ZGUyZjNhNzgiLCJuYW1lIjoib3JrbyIsInBhc3N3b3JkIjoiMTIzIiwiaWF0IjoxNDk2MDQ3OTk5LCJleHAiOjE0OTYxMzQzOTl9.K7wVWDfEe3hTH-h8bjBWJULjISUyhZmJZTyUIdiKyo4";
-                DataAppender da = new DataAppender(token);
-                da.addTask(ctx, new IDataResponseHandler() {
+                DataAppender da = new DataAppender<Task>(token, new IDataResponseHandler() {
                     @Override
                     public void OnError(int errorCode) {
                         if (errorCode == 403) {
-                            showMessageToast("Error authenticating user. Please login and retry");
+                            showMessageToast(getString(R.string.msg_error_auth));
                         } else if (errorCode == 505) {
-                            showMessageToast("The server is not responding. Please retry later");
+                            showMessageToast(getString(R.string.msg_server_down));
                         }
                     }
 
                     @Override
-                    public void OnSuccess() {
-                        showMessageToast("Assignment was added");
-                        if (getIntent().getBooleanExtra("IS_NEW", true)) {
-                            ((BaseApplication)getApplication()).getModel().addTask(ctx);
+                    public void OnSuccess(String message) {
+                        showMessageToast(getString(R.string.msg_task_added));
+                        Model m = ((BaseApplication)getApplication()).getModel();
+                        if (isNew) {
+                            m.addTask(ctx);
+                        } else {
+                            m.taskUpdated(ctx);
                         }
                         onBackPressed();
                     }
                 });
+                da.addTask(ctx, isNew);
             }
         });
     }
