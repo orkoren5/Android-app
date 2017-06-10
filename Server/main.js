@@ -78,7 +78,11 @@ apiRoutes.get('/courses/:id', function(req, response) {
 });
 
 apiRoutes.get('/courses', function(req, response) {
-	handler.handleGetRequest("courses", req, response);
+  if (req.query.hasOwnProperty("userId")) {
+    handler.handleGetCoursesByUserId(req, response);
+  } else {
+    handler.handleGetRequest("courses", req, response);
+  }
 });
 
 apiRoutes.get('/assignments/:id', function(req, response) {
@@ -98,7 +102,7 @@ apiRoutes.get('/groups', function(req, response) {
 });
 
 apiRoutes.get('/users/:id', function(req, response) {
-	handler.handleGetUser(req, response);
+	handler.handleGetByIdRequest("users", req.params.id, response);
 });
 
 apiRoutes.get('/tasks/:id', function(req, response) {

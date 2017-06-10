@@ -123,7 +123,7 @@ var handleGetRequest = function(sEntityName, req, responseStream) {
 	});
 };
 
-var _handleGetRequestWithLookup = function(sEntityName, req, responseStream) {
+var _handleGetRequestWithAggregation = function(sEntityName, req, responseStream, fnCleanOutput) {
 	var colName = getColName(sEntityName);
 	var query = req.query;
 	var aggregattion = req.aggregation;
@@ -131,17 +131,21 @@ var _handleGetRequestWithLookup = function(sEntityName, req, responseStream) {
 	MongoClient.connect(sUrl, function(err, db) {
 		var col = db.collection(colName);
 		if (Object.getOwnPropertyNames(query).length === 0) {
-			//query.owner = req.user._id.toString();
+			query.owner = req.user._id.toString();
 		}
 		console.log(req.query);
 		col.aggregate(aggregattion).toArray(function(err, items) {
-			responseStream.json(items);
+			var retItems = items;
+			if (fnCleanOutput && typeof(fnCleanOutput) === "function") {
+				retItems = fnCleanOutput(items);
+			}
+			responseStream.json(retItems);
 		    db.close();
 	  	});
 	});
 };
 
-var handleGetUser = function(req, responseStream) {
+var handleGetCoursesByUserId = function(req, responseStream) {
 	req.aggregation = [
 		{"$limit": 1},
 		{"$unwind": "$courseIds"},
@@ -158,12 +162,18 @@ var handleGetUser = function(req, responseStream) {
 			"courses": {$push: "$courses"}
 		}}
 	];
-	req.query["_id"] = convertHexToObjectID(req.params.id);
-	_handleGetRequestWithLookup("users", req, responseStream);
+	req.query["_id"] = convertHexToObjectID(req.query.userId);
+	delete req.query["userId"];
+	_handleGetRequestWithAggregation("users", req, responseStream, function(items) {
+		if (items.length > 0) { 
+			return items[0].courses
+		}
+		return [];
+	});
 }
 
 var handleGetAssignmentsRequest = function(req, responseStream) {
-	req.aggregattion = [
+	req.aggregation = [
 		{"$unwind": "$users"},
 		{"$lookup": {
 			from: "users", 
@@ -195,7 +205,7 @@ var handleGetAssignmentsRequest = function(req, responseStream) {
 			convertHexToObjectID(req.user._id)
 		]
 	};
-	_handleGetRequestWithLookup("assignments", req, responseStream);
+	_handleGetRequestWithAggregation("assignments", req, responseStream);
 }
 
 var handlePostRequest = function(sEntityName, req, responseStream) {
@@ -313,8 +323,9 @@ exports.handleDeleteRequest = handleDeleteRequest;
 exports.handleLoginRequest = handleLoginRequest;
 exports.handleSignUpRequest = handleSignUpRequest;
 exports.handlePostAddOrDeleteUserToAssignment = handlePostAddOrDeleteUserToAssignment;
-exports.handleGetUser = handleGetUser;
+exports.handleGetCoursesByUserId = handleGetCoursesByUserId;
 
 
 
 
+
