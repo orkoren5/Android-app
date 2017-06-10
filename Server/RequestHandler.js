@@ -61,9 +61,10 @@ var handleLoginRequest = function(oUser, secretKey, responseStream) {
 		        // create a token
 		        var token = jwt.sign(user, secretKey, {
 		          expiresIn: "24h" // expires in 24 hours
-		        });		    
+		        });		
 		        responseStream.json({
 		          success: true,
+		          user: user,
 		          message: 'Enjoy your token!',
 		          token: token
 		        });
@@ -77,7 +78,7 @@ var handleSignUpRequest = function(oUser, secretKey, responseStream) {
 	MongoClient.connect(sUrl, function(err, db) {	
 		var col = db.collection("users");
 		if (checkValidity("users", oUser)) {
-			oUser.groupIds = [];
+			oUser.courseIds = [];
 			oUser.assignmentIds = [];
 			col.insertOne(oUser, function(err, result) {
 
@@ -125,12 +126,12 @@ var handleGetRequest = function(sEntityName, req, responseStream) {
 var _handleGetRequestWithLookup = function(sEntityName, req, responseStream) {
 	var colName = getColName(sEntityName);
 	var query = req.query;
-	var aggregattion = req.aggregattion;
+	var aggregattion = req.aggregation;
 	aggregattion.unshift({ "$match": parseQuery(query) });
 	MongoClient.connect(sUrl, function(err, db) {
 		var col = db.collection(colName);
 		if (Object.getOwnPropertyNames(query).length === 0) {
-			query.owner = req.user._id.toString();
+			//query.owner = req.user._id.toString();
 		}
 		console.log(req.query);
 		col.aggregate(aggregattion).toArray(function(err, items) {
@@ -139,6 +140,27 @@ var _handleGetRequestWithLookup = function(sEntityName, req, responseStream) {
 	  	});
 	});
 };
+
+var handleGetUser = function(req, responseStream) {
+	req.aggregation = [
+		{"$limit": 1},
+		{"$unwind": "$courseIds"},
+		{"$lookup": {
+			from: "courses", 
+			localField: "courseIds", 
+			foreignField: "_id", 
+			as: "courses"
+		}},
+		{"$project": {"name":1, "courses": { "$arrayElemAt": [ "$courses", 0 ] }}},
+		{"$group": {
+			"_id": "$_id",
+			"name": {$first: "$name"},
+			"courses": {$push: "$courses"}
+		}}
+	];
+	req.query["_id"] = convertHexToObjectID(req.params.id);
+	_handleGetRequestWithLookup("users", req, responseStream);
+}
 
 var handleGetAssignmentsRequest = function(req, responseStream) {
 	req.aggregattion = [
@@ -291,6 +313,8 @@ exports.handleDeleteRequest = handleDeleteRequest;
 exports.handleLoginRequest = handleLoginRequest;
 exports.handleSignUpRequest = handleSignUpRequest;
 exports.handlePostAddOrDeleteUserToAssignment = handlePostAddOrDeleteUserToAssignment;
+exports.handleGetUser = handleGetUser;
+
 
 
 

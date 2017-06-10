@@ -98,7 +98,7 @@ apiRoutes.get('/groups', function(req, response) {
 });
 
 apiRoutes.get('/users/:id', function(req, response) {
-	handler.handleGetByIdRequest("users", req.params.id, response);
+	handler.handleGetUser(req, response);
 });
 
 apiRoutes.get('/tasks/:id', function(req, response) {
