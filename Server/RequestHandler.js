@@ -12,9 +12,13 @@ function checkValidity(sEntityName, oObject, sForeignIds) {
 	if (sForeignIds) {
 		var fields = sForeignIds.split(",");
 		for (var i = 0; i < fields.length; i++) {
-			var strId = oObject[fields[i]];
-			if (strId) {
-				oObject[fields[i]] = convertHexToObjectID(strId);
+			var value = oObject[fields[i]];
+			if (value && typeof(value) === "string") {
+				oObject[fields[i]] = convertHexToObjectID(value);
+			} else if (value && Array.isArray(value)) {
+				for (var j = 0; j < value.length; j++) {
+					oObject[fields[i]][j] = convertHexToObjectID(value[j]);
+				}
 			}
 		}
 	}
@@ -328,4 +332,4 @@ exports.handleGetCoursesByUserId = handleGetCoursesByUserId;
 
 
 
-
+
