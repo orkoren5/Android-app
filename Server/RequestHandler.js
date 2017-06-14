@@ -33,9 +33,31 @@ function convertHexToObjectID(sHex) {
 	}
 }
 
-function parseQuery(query) {
+function parseQueryAndReturnFilters(query) {
+	var filters = {};
+
 	for (var key in query) {
+		if (key.charAt(0) === "$") {
+			filters[key] = query[key];
+			delete query[key];
+		}
+	}
+
+	parseQueryStep(query);
+	parseQueryStep(filters);
+	return filters;
+}
+
+function parseQueryStep(query) {
+for (var key in query) {
 		var value = query[key];
+
+		if (query.mongoFilters && key.charAt(0) === "$") {
+			query.mongoFilters[key] = value
+			delete query[key];
+			break;
+		}
+
 		if (typeof(value) === "string") {
 
 			// Cast a number  		
@@ -59,7 +81,7 @@ function parseQuery(query) {
 			var arr = value.split(",");
 			if (arr.length > 1) {
 				query[key] = {
-					"$in" : parseQuery(arr)
+					"$in" : parseQueryStep(arr)
 				}
 			}
 		}
@@ -144,7 +166,15 @@ var handleGetRequest = function(sEntityName, req, responseStream) {
 		if (Object.getOwnPropertyNames(query).length === 0) {
 			query.owner = req.user._id.toString();
 		}
-		col.find(parseQuery(query)).toArray(function(err, items) {
+		var filters = parseQueryAndReturnFilters(query);
+		var cursor = col.find(query);
+		if (filters["$skip"]) {
+			cursor.skip(filters["$skip"]);
+		}
+		if (filters["$top"]) {
+			cursor.limit(filters["$top"]);
+		}
+		cursor.toArray(function(err, items) {
 			responseStream.json(items);
 		    db.close();
 	  	});
@@ -155,7 +185,14 @@ var _handleGetRequestWithAggregation = function(sEntityName, req, responseStream
 	var colName = getColName(sEntityName);
 	var query = req.query;
 	var aggregattion = req.aggregation;
-	aggregattion.unshift({ "$match": parseQuery(query) });
+	var filters = parseQueryAndReturnFilters(query);
+	if (filters["$skip"]) {
+		aggregattion.unshift({"$skip": filters["$skip"]});
+	}
+	if (filters["$top"]) {
+		aggregattion.unshift({"$limit": filters["$top"]});
+	}
+	aggregattion.unshift({ "$match": query });
 	MongoClient.connect(sUrl, function(err, db) {
 		var col = db.collection(colName);
 		if (Object.getOwnPropertyNames(query).length === 0) {
@@ -350,6 +387,9 @@ exports.handleLoginRequest = handleLoginRequest;
 exports.handleSignUpRequest = handleSignUpRequest;
 exports.handlePostAddOrDeleteUserToAssignment = handlePostAddOrDeleteUserToAssignment;
 exports.handleGetCoursesByUserId = handleGetCoursesByUserId;
+
+
+
 
 
 
