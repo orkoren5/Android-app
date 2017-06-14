@@ -35,9 +35,33 @@ function convertHexToObjectID(sHex) {
 
 function parseQuery(query) {
 	for (var key in query) {
-  		var value = query[key];
-		if (!isNaN(value)) {
-			query[key] = value*1;
+		var value = query[key];
+		if (typeof(value) === "string") {
+
+			// Cast a number  		
+			if (!isNaN(value)) {
+				query[key] = value*1;
+			}
+			
+			// Cast ObjectID
+			if (ObjectID.isValid(value)) {
+				query[key] = convertHexToObjectID(value);
+			}
+			
+			// Cast a boolean  		
+			if (value === "true") {
+				query[key] = true;
+			} else if (value === "false") {
+				query[key] = false;
+			}
+
+			// Case an array
+			var arr = value.split(",");
+			if (arr.length > 1) {
+				query[key] = {
+					"$in" : parseQuery(arr)
+				}
+			}
 		}
 	};
 	return query;
@@ -204,11 +228,8 @@ var handleGetAssignmentsRequest = function(req, responseStream) {
 		}}
 	];
 
-	req.query["users"] = {
-		"$in" : [
-			convertHexToObjectID(req.user._id)
-		]
-	};
+	req.query["users"] = convertHexToObjectID(req.user._id);
+
 	_handleGetRequestWithAggregation("assignments", req, responseStream);
 }
 
@@ -240,6 +261,7 @@ var handlePostAssignmentsRequest = function(req, responseStream) {
 	};
 
 	delete req.body["users"];
+	req.body.global = true;
 	handlePostRequest("assignments", req);
 
 	clonedReq.body["users"] = [ convertHexToObjectID(clonedReq.user._id) ]; // Add self to users list
@@ -333,3 +355,4 @@ exports.handleGetCoursesByUserId = handleGetCoursesByUserId;
 
 
 
+

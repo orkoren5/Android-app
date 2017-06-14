@@ -89,8 +89,12 @@ apiRoutes.get('/assignments/:id', function(req, response) {
 	handler.handleGetByIdRequest("assignments", req.params.id, response);
 });
 
-apiRoutes.get('/assignments', function(req, response) {
+apiRoutes.get('/myAssignments', function(req, response) {
 	handler.handleGetAssignmentsRequest(req, response);
+});
+
+apiRoutes.get('/assignments', function(req, response) {
+  handler.handleGetRequest("assignments", req, response);
 });
 
 apiRoutes.get('/groups/:id', function(req, response) {
@@ -129,6 +133,9 @@ apiRoutes.post('/assignments', function(req, response) {
 	handler.handlePostAssignmentsRequest(req, response);
 });
 
+apiRoutes.post('/courses', function(req, response) {
+  handler.handlePostRequest("courses", req, response);
+});
 
 apiRoutes.post('/addOrDeleteUserToAssignment/:id', function(req, response) {
   handler.handlePostAddOrDeleteUserToAssignment(req, response);
