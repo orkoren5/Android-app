@@ -80,6 +80,9 @@ public class TasksAdapter extends BaseAdapter<TasksAdapter.TasksViewHolder> {
         holder.txtDaysAssessment.setText(res.getString(R.string.days_assessment, task.getDaysAssessment()));
         holder.txtStatus.setText(task.getStatus().toString());
         holder.txtStatus.setTextColor(getStatusColor(task.getStatus()));
+        if (task.getAssignedUser() != null) {
+            holder.txtAssignedUser.setText(task.getAssignedUser().getName());
+        }
         holder.relatedTask = task;
     }
 

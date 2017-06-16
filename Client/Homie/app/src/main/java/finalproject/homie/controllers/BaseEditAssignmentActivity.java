@@ -15,7 +15,8 @@ import finalproject.homie.R;
  * Created by I311044 on 01/06/2017.
  */
 
-public abstract class BaseEditAssignmentActivity extends BaseNavigationActivity {
+public abstract class BaseEditAssignmentActivity extends BaseNavigationActivity
+    implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,25 +24,25 @@ public abstract class BaseEditAssignmentActivity extends BaseNavigationActivity 
 
         BottomNavigationView nav = (BottomNavigationView)findViewById(R.id.bottom_navigation);
 
-        nav.setOnNavigationItemSelectedListener(new OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.toString()) {
-                    case "Group":
-                        openGroupActivity();
-                        break;
-                    case "Tasks":
-                        openTaskListActivity();
-                        break;
-                    case "Edit":
-                        openEditAssignmentActivity();
-                        break;
-                    default:
-                        break;
-                }
-                return true;
-            }
-        });
+        nav.setOnNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.toString()) {
+            case "Group":
+                openGroupActivity();
+                break;
+            case "Tasks":
+                openTaskListActivity();
+                break;
+            case "Edit":
+                openEditAssignmentActivity();
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
     @Override

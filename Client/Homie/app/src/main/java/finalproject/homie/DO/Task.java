@@ -65,6 +65,14 @@ public class Task extends BusinessEntity {
     private String assignedUserId = "";
 
     @Bindable
+    public User getAssignedUser() {
+        if (assignment != null) {
+            return assignment.getUsers().get(assignedUserId);
+        }
+        return null;
+    }
+
+    @Bindable
     public Status getStatus() {
         return status;
     }

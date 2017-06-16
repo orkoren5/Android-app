@@ -5,19 +5,18 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.ParseException;
-import java.util.Date;
+import java.util.List;
 
 import finalproject.homie.DAL.DataAppender;
-import finalproject.homie.DO.Assignment;
 import finalproject.homie.DO.Task;
+import finalproject.homie.DO.User;
 import finalproject.homie.R;
 import finalproject.homie.adapters.EntityTextWatcher;
 import finalproject.homie.databinding.ActivityEditTaskBinding;
@@ -48,6 +47,22 @@ public class EditTask extends AppCompatActivity {
 
         EditText txtDescription = (EditText)findViewById(R.id.txtDescription);
         txtDescription.addTextChangedListener(new EntityTextWatcher(ctx, "setDescription", String.class));
+
+        final List<User> users = m.getSelectedAssignment().getUsers();
+        Spinner spnrUsers = (Spinner) findViewById(R.id.spnrProcessingUser);
+        spnrUsers.setAdapter(new ArrayAdapter<User>(this, android.R.layout.simple_list_item_1, users));
+        spnrUsers.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                ctx.setAssignedUserId(users.get(position).getID());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        //spnrUsers.setSelection(ctx.getStatus().toInt() - 1);
 
         Spinner spinner = (Spinner) findViewById(R.id.spinner_status);
         spinner.setAdapter(new ArrayAdapter<Status>(this, android.R.layout.simple_list_item_1, Status.values()));

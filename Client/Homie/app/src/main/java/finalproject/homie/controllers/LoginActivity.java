@@ -182,7 +182,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            this.connectedUser.setName(email);
             final Context me = this;
             CallServerFunction loginTask = new CallServerFunction("", new IDataResponseHandler() {
                 @Override
@@ -202,6 +201,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         JSONObject obj = new JSONObject(result);
                         token = obj.getString("token");
                         success = obj.getBoolean("success");
+                        connectedUser.parseJSON(obj.getJSONObject("user"));
                     } catch (JSONException ex) {
                         // Do nothing
                     }

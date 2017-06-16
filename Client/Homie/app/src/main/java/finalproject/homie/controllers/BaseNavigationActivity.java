@@ -1,5 +1,6 @@
 package finalproject.homie.controllers;
 
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import finalproject.homie.R;
 
@@ -22,11 +24,28 @@ import finalproject.homie.R;
  */
 
 public abstract class BaseNavigationActivity extends AppCompatActivity
-        implements BottomNavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
+
+    protected boolean loggingOut = false;
+
+    boolean tmp = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if (fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {
@@ -36,14 +55,36 @@ public abstract class BaseNavigationActivity extends AppCompatActivity
                 }
             });
         }
+        setTitle();
+
+        if (!tmp) {
+            fillServer();
+        }
     }
 
-    protected abstract void additem();
+    public void fillServer() {
+
+    }
+
+    // May be overriden
+    public void setTitle() {
+        setTitle(getString(R.string.app_name));
+    };
+
+    // May be overriden
+    protected void additem() {};
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        TextView txtNavUsername = (TextView) findViewById(R.id.txtNavUsername);
+        if (txtNavUsername != null) {
+            txtNavUsername.setText(((BaseApplication) getApplication()).getConnectedUser().getName());
+        }
+
         if (((BaseApplication)getApplication()).getToken().isEmpty()) {
+            loggingOut = true;
             Intent intent = new Intent(this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
@@ -51,8 +92,10 @@ public abstract class BaseNavigationActivity extends AppCompatActivity
     }
 
     protected void logout() {
-        ((BaseApplication) getApplication()).setToken("");
-        ((BaseApplication) getApplication()).getConnectedUser().setName("");
+        BaseApplication app = (BaseApplication) getApplication();
+        app.setToken("");
+        app.getConnectedUser().setName("");
+        app.getModel().clear();
         Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         startActivity(intent);
@@ -105,10 +148,10 @@ public abstract class BaseNavigationActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
+        if (id == R.id.nav_all_assignments) {
+            simpleStartActivity(AllAssignments.class);
+        } else if (id == R.id.nav_all_courses) {
+            simpleStartActivity(AllCourses.class);
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
@@ -122,6 +165,12 @@ public abstract class BaseNavigationActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void simpleStartActivity(Class<?> activity) {
+        Intent intent = new Intent(this, activity);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivity(intent);
     }
 }
 

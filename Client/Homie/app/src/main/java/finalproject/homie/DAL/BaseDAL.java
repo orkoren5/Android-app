@@ -1,26 +1,17 @@
 package finalproject.homie.DAL;
 
-import android.app.DownloadManager;
 import android.os.AsyncTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import cz.msebera.android.httpclient.HttpResponse;
-import cz.msebera.android.httpclient.ProtocolVersion;
-import cz.msebera.android.httpclient.StatusLine;
 import cz.msebera.android.httpclient.client.HttpClient;
 import cz.msebera.android.httpclient.client.config.RequestConfig;
-import cz.msebera.android.httpclient.client.methods.HttpEntityEnclosingRequestBase;
-import cz.msebera.android.httpclient.client.methods.HttpPost;
 import cz.msebera.android.httpclient.client.methods.HttpRequestBase;
 import cz.msebera.android.httpclient.conn.ConnectTimeoutException;
-import cz.msebera.android.httpclient.entity.ContentType;
-import cz.msebera.android.httpclient.entity.StringEntity;
 import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
 import finalproject.homie.DO.BusinessEntity;
 import finalproject.homie.controllers.IDataResponseHandler;
@@ -44,7 +35,7 @@ public abstract class BaseDAL extends AsyncTask<String, Integer, BaseDAL.MyRespo
     }
 
     protected String baseUrl = "http://159.203.118.144:8081/";
-    //protected String baseUrl = "http://localhost:8081/";
+    //protected String baseUrl = "http://10.0.2.2:8081/";
     private String token = "";
     private IDataResponseHandler handler = null;
 
@@ -55,7 +46,7 @@ public abstract class BaseDAL extends AsyncTask<String, Integer, BaseDAL.MyRespo
 
     public abstract HttpRequestBase createHttpRequest() throws JSONException;
 
-    public HttpRequestBase buildRequest() throws JSONException {
+    private HttpRequestBase buildRequest() throws JSONException {
         HttpRequestBase request = createHttpRequest();
         request.addHeader("Content-type", "application/json");
         request.addHeader("token", token);
@@ -92,7 +83,7 @@ public abstract class BaseDAL extends AsyncTask<String, Integer, BaseDAL.MyRespo
     protected void onPostExecute(MyResponse response) {
         int status = response.statusCode;
         if (status == 504) {
-            // Handle crash
+            this.handler.OnError(status);
         } else if (status == 200) {
             this.handler.OnSuccess(response.message);
         } else if (status == 403) {

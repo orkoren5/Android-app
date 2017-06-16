@@ -76,13 +76,12 @@
                 android:layout_gravity="end|center"
                 android:textAlignment="textEnd"
                 />
-            <EditText
-                android:id="@+id/txtProcessingUser"
+            <Spinner
+                android:id="@+id/spnrProcessingUser"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/task_processing_user_hint"
-                android:text="@{String.valueOf(task.title)}"
-                />
+                android:spinnerMode="dialog"/>
 
         </LinearLayout>
         <LinearLayout

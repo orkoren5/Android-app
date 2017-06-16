@@ -20,6 +20,7 @@ import org.json.*;
 import finalproject.homie.DO.Assignment;
 import finalproject.homie.DO.BusinessEntity;
 import finalproject.homie.DO.Course;
+import finalproject.homie.DO.User;
 import finalproject.homie.adapters.BaseAdapter;
 import finalproject.homie.controllers.BaseApplication;
 import finalproject.homie.controllers.IDataResponseHandler;
@@ -45,16 +46,28 @@ public class DataFetcher<T extends BusinessEntity> extends BaseDAL {
         this.list = list;
     }
 
-    public void getCourses() {
+    public void getCoursesByUserId(String userId) {
         factory = new BusinessEntity.Factory(Course.class);
-        url = baseUrl + "api/courses?university=BGU";
-        this.execute();
+        url = baseUrl + "api/courses?userId=" + userId;
+        execute();
+    }
+
+    public void getAllCourses(int skip, int top) {
+        factory = new BusinessEntity.Factory(Course.class);
+        url = baseUrl + "api/courses?university=BGU&$skip=" + skip + "&$top=" + top;
+        execute();
     }
 
     public void getAssignments(long courseNumber) {
         factory = new BusinessEntity.Factory(Assignment.class);
-        url = baseUrl + "api/assignments?courseNumber=" + courseNumber;
-        this.execute();
+        url = baseUrl + "api/myAssignments?courseNumber=" + courseNumber;
+        execute();
+    }
+
+    public void getAllAssignments(User user) {
+        factory = new BusinessEntity.Factory(Assignment.class);
+        url = baseUrl + "api/assignments?global=true&courseId=" + user.getCourseIdsStr();
+        execute();
     }
 
     @Override

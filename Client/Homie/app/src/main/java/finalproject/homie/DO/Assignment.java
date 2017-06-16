@@ -35,12 +35,12 @@ public class Assignment extends BusinessEntity {
     private Date deadline = new Date();
     private int daysAssessment;
     private Course relatedCourse;
-    private final List<User> users = new EntityArrayList<>();
+    private final EntityArrayList<User> users = new EntityArrayList<>();
     private TasksHolder tasks = new TasksHolder();
 
     private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
-    public List<User> getUsers() {
+    public EntityArrayList<User> getUsers() {
         return users;
     }
 
@@ -112,14 +112,14 @@ public class Assignment extends BusinessEntity {
         json.put("number", number);
         json.put("deadline", Assignment.format.format(deadline));
         json.put("daysAssessment", daysAssessment);
-        json.put("couresId", courseId);
+        json.put("courseId", relatedCourse.getID());
         json.put("approvedValid", true);
         return json;
     }
 
     @Override
     public String getForeignIdFields() {
-        return "couresId";
+        return "courseId";
     }
 
     @Override
@@ -131,6 +131,7 @@ public class Assignment extends BusinessEntity {
         if (json.has("courseId")) {
             this.setCourseId(json.getString("courseId"));
         }
+
         try {
             this.setDeadline(format.parse(json.getString("deadline")));
         }
@@ -139,19 +140,23 @@ public class Assignment extends BusinessEntity {
             this.setDeadline(new Date(0));
         }
 
-        JSONArray tasksArr = json.getJSONArray("tasks");
-        for (int i = 0; i < tasksArr.length(); i++) {
-            Task t = new Task();
-            t.parseJSON(tasksArr.getJSONObject(i));
-            t.setRelatedAssignment(this);
-            tasks.add(t);
+        if (json.has("tasks")) {
+            JSONArray tasksArr = json.getJSONArray("tasks");
+            for (int i = 0; i < tasksArr.length(); i++) {
+                Task t = new Task();
+                t.parseJSON(tasksArr.getJSONObject(i));
+                t.setRelatedAssignment(this);
+                tasks.add(t);
+            }
         }
 
-        JSONArray groupArr = json.getJSONArray("userObjects");
-        for (int i = 0; i < groupArr.length(); i++) {
-            User u = new User();
-            u.parseJSON(groupArr.getJSONObject(i));
-            users.add(u);
+        if (json.has("userObjects")) {
+            JSONArray groupArr = json.getJSONArray("userObjects");
+            for (int i = 0; i < groupArr.length(); i++) {
+                User u = new User();
+                u.parseJSON(groupArr.getJSONObject(i));
+                users.add(u);
+            }
         }
 
         return this;

@@ -64,11 +64,16 @@
             android:name=".controllers.EditTask"
             android:label="@string/title_activity_edit_task"
             android:parentActivityName=".controllers.MyAssignments">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="finalproject.homie.controllers.MyAssignments" />
         </activity>
-        <activity android:name=".controllers.EditGroup" />
+        <activity android:name=".controllers.EditGroup"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".controllers.AllCourses"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".controllers.AllAssignments"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
     </application>
 
 </manifest>

@@ -11,9 +11,10 @@ import java.util.List;
  */
 
 public class Course extends BusinessEntity{
-    String name;
-    long number;
-    List<Assignment> assignmentList = new ArrayList<>();
+    private String name;
+    private long number;
+    private List<Assignment> assignmentList = new ArrayList<>();
+    private boolean isSelected = false;
 
     public Course() {};
 
@@ -40,6 +41,14 @@ public class Course extends BusinessEntity{
 
     public void setNumber(long number) {
         this.number = number;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
     @Override

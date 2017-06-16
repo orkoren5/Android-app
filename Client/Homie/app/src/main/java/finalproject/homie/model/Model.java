@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import finalproject.homie.DAL.*;
 import finalproject.homie.DO.*;
@@ -21,8 +23,9 @@ public class Model {
     public static final int COURSES_FLAG = 0x02;
     public static final int TASKS_FLAG = 0x04;
 
+    private List<Course> allCourses = new LinkedList<>();
+    private List<Assignment> allAssignments = new ArrayList<>();
     private List<Course> myCourses = new ArrayList<>();
-    private List<Assignment> myAssignments = new ArrayList<>();
     private HashMap<String, TasksHolder> tasks = new HashMap<>();
     private HashMap<String, List<Assignment>> assignments = new HashMap<>();
     private Assignment selectedAssignment = null;
@@ -42,10 +45,6 @@ public class Model {
 
     public List<Course> getMyCourses() {
         return myCourses;
-    }
-
-    public List<Assignment> getMyAssignments() {
-        return myAssignments;
     }
 
     public List<Assignment> getAssignmentsForCourse(String courseId) {
@@ -142,6 +141,34 @@ public class Model {
 
     public Task getSelectedTask() {
         return this.selectedTask;
+    }
+
+    public List<Course> getAllCourses() {
+        return allCourses;
+    }
+
+    public void clear() {
+        allAssignments.clear();
+        myCourses.clear();
+        tasks.clear();
+        assignments.clear();
+    }
+
+    public void updateMyCourses(User user) {
+        List<String> copyList = new ArrayList<>(user.getCourseIds());
+
+        for (Course c : allCourses) {
+            for (int i = 0; i < copyList.size(); i++) {
+                if (c.getID().equals(copyList.get(i))) {
+                    copyList.remove(i);
+                    c.setSelected(true);
+                }
+            }
+        }
+    }
+
+    public List<Assignment> getAllAssignments() {
+        return allAssignments;
     }
 }
 

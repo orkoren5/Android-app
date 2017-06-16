@@ -5,6 +5,8 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="my_courses">My Courses</string>
     <string name="my_assignments">My Assignments</string>
+    <string name="all_courses">All Courses</string>
+    <string name="all_assignments">All Assignments</string>
     <string name="assignment_no">Assignment %1$d</string>
     <string name="deadline">Deadline: %1$s</string>
     <string name="title_activity_navigaion">NavigaionActivity</string>

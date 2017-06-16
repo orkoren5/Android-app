@@ -55,14 +55,6 @@ public class AssignmentsAdapter extends BaseAdapter<AssignmentsAdapter.Assignmen
         this.listener = listener;
     }
 
-    public void fetchDataFromBH(IDataResponseHandler handler) {
-        this.fetchDataFromBH(0, handler);
-    }
-    public void fetchDataFromBH(long courseNumber, final IDataResponseHandler handler) {
-        final AssignmentsAdapter adapter = this;
-
-    }
-
     @Override
     public AssignmentsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())

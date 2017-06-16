@@ -54,6 +54,13 @@ public class DataAppender<T extends BusinessEntity> extends BaseDAL {
         super(token, handler);
     }
 
+    public void updateUser(User user) {
+        url = baseUrl + "api/users/" + user.getID();
+        method = "PUT";
+        obj = (T) user;
+        execute();
+    }
+
     public void addAssignment(Assignment assignment, boolean isNew) {
         url = baseUrl + "api/assignments";
         url += isNew ? "" : "/" + assignment.getID();

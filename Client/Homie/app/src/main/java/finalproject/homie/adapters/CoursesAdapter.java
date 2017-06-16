@@ -2,10 +2,12 @@ package finalproject.homie.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -25,12 +27,15 @@ import finalproject.homie.controllers.MyAssignments;
 
 public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder> {
 
+    private boolean showChecked = true;
     private List<Course> courses;
     private final IEntityClickListener listener;
 
     public class CourseViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView txtName;
         public TextView txtNumber;
+        public ImageView imgSelected;
+
         protected long courseNumber = 0;
         protected int position = 0;
         protected String courseId;
@@ -41,40 +46,28 @@ public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder>
             super(view);
             txtName = (TextView) view.findViewById(R.id.txtCourseName);
             txtNumber = (TextView) view.findViewById(R.id.txtCourseNumber);
+            imgSelected = (ImageView) view.findViewById(R.id.imgCourseSelected);
             view.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             listener.onClick(course);
+            imgSelected.setVisibility(course.isSelected() ? View.VISIBLE : View.INVISIBLE);
         }
     }
 
-    public CoursesAdapter(Context context, List<Course> courses, IEntityClickListener listener) {
+    public CoursesAdapter(Context context, List<Course> courses, boolean showChecked, IEntityClickListener listener) {
         this.courses = courses;
         this.context = context;
         this.listener = listener;
-    }
-
-    public void fetchDataFromBH() {
-        String token = ((BaseApplication)context.getApplicationContext()).getToken();
-        final CoursesAdapter adapter = this;
-        new DataFetcher<Course>(this.courses, token, new IDataResponseHandler() {
-            @Override
-            public void OnError(int errorCode) {
-                // TODO: handle Error
-            }
-
-            @Override
-            public void OnSuccess(String message) {
-                adapter.notifyDataSetChanged();
-            }
-        }).getCourses();
+        this.showChecked = showChecked;
     }
 
     public void setOnItemClickListener(View.OnClickListener listener) {
 
     }
+
     @Override
     public CourseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -92,6 +85,9 @@ public class CoursesAdapter extends BaseAdapter<CoursesAdapter.CourseViewHolder>
         holder.position = position;
         holder.courseId = course.getID();
         holder.course = course;
+        if (showChecked) {
+            holder.imgSelected.setVisibility(course.isSelected() ? View.VISIBLE : View.INVISIBLE);
+        }
     }
 
     @Override
